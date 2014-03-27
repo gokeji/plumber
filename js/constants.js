@@ -1,0 +1,4 @@
+var CANVAS_WIDTH = 1000;
+var CANVAS_HEIGHT = 600;
+var TOILET_MAX_SPEED = 15;
+var TIME_PER_LEVEL = 15; // 30 seconds
