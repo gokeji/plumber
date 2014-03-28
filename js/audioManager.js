@@ -2,13 +2,22 @@ var Sound = function(){
     this.sounds = {};
     this.muted = false;
     this.nowPlaying = {};
+    this.loadedCount = 0;
 
     // Load all existing audio files into sounds
-    this.init = function(){
-        $('audio').each(function(){
-            var name = this.id;
-            Sound.sounds[name] = this;
+    this.load = function(src, id, loadedCallback){
+        var sound = $('<audio />').get(0);
+        sound.preload = "auto";
+        sound.src = src;
+        sound.addEventListener("canplaythrough", function(){
+            Sound.loadedCount ++;
+            loadedCallback();
+            if(Sound.loadedCount == Object.keys(Sound.sounds).length){
+                $(Sound).trigger("loaded");
+                console.log("FINISHED LOADING");
+            }
         });
+        Sound.sounds[id] = sound;
     }
 
     this.play = function(name, loop, volume){
@@ -90,6 +99,10 @@ var Sound = function(){
 
     this.unmute = function(){
 
+    }
+
+    this.loaded = function(){
+        return (Sound.loadedCount == Object.keys(Sound.sounds).length);
     }
 
 

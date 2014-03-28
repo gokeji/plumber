@@ -31,10 +31,51 @@ $(function(){
     var paused = false;
     var gameGoing = false;
 
-    //// preload sounds
+    var soundURL = "sounds/";
+    var soundsToLoad = ["applauseFlush.mp3", "bg.wav", "click.mp3", "coin.mp3", "down.mp3", "gameover.mp3", "pause.mp3", "up.mp3"];
+//    var soundIDs = ["applauseFlush", "bg", "click", "coin", "down", "gameover", "pause", "up"];
+
+    // Setup Screen
+
+    ctx.save();
+    ctx.font = "50px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+    ctx.restore();
+
+    // preload sounds
     Sound = new Sound();
-    Sound.init();
+
+    $(Sound).bind("loaded", function(){
+        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.save();
+        ctx.font = "50px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Loaded", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+        ctx.font = "30px Arial";
+        ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 70);
+        ctx.restore();
+    })
+
+    for (var i = 0; i < soundsToLoad.length; i++){
+        var src = soundsToLoad[i];
+        var id = src.split(".", 1); console.log(id);
+        src = soundURL + soundsToLoad[i];
+
+        var callback = construct(src);
+
+        function construct(src){
+            return function(){
+                console.log("loaded "+ src);
+            };
+        }
+
+        Sound.load(src, id, callback);
+    }
     // TODO Add game loading bar
+
 
     // ====== Setting Game Loop ======
 
@@ -50,13 +91,6 @@ $(function(){
     //gameGoing = true;
     //gameOver = false;
 
-    // Setup Screen
-    ctx.save();
-    ctx.font = "50px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-    ctx.restore();
 
     plungers.push(plunger()); // Add a plunger right away to start off the game with
 
