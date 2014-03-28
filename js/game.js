@@ -11,16 +11,17 @@ var t = new Toilet();
 var plungers = [];
 var keys = [];
 
-var freq = [0.5, 0.66, 1, 1, 1, 1, 1, 1, 1]; // Plungers per second for each level
-var fallSpeed = [2, 3, 4, 5, 5, 5, 5, 5, 5]; // Plungers falling speed for each level
+var freq = [0.66, 1, 1.2, 1.3, 1.4, 1.5]; // Plungers per second for each level
+var fallSpeed = [4, 4, 5, 5, 6, 6, 7]; // Plungers falling speed for each level
 var score = 0;
 var maxHP = 3;
 var HP = maxHP;
 var level = 1;
 var remainingTime = TIME_PER_LEVEL;
 var gameOver = true;
-var toiletGrey = Sprite("toilet-grey", 0, 0, 50, 50);
-var toiletRed = Sprite("toilet-red", 0, 0, 50, 50);
+
+var toiletGrey = Sprite("toilet-grey", 0, 0, 50, 50); // HP toilet icon
+var toiletRed = Sprite("toilet-red", 0, 0, 50, 50); // HP toilet icon
 var muted = false;
 var displayText = "";
 var lastDisplayText = "";
@@ -28,6 +29,9 @@ var showCenterText = false;
 var backgroundColor = "white";
 var paused = false;
 var gameGoing = false;
+
+// preload sounds
+Sound.preload(["bg"], true);
 
 // ====== Setting Game Loop ======
 
@@ -343,8 +347,10 @@ document.body.addEventListener("keyup", function (e) {
 
 // Pause game
 function pause(){
-    if(!gameOver && gameGoing)
+    if(!gameOver && gameGoing) {
         paused = true;
+        Sound.pauseAll();
+    }
 }
 
 // Resume game
@@ -354,6 +360,7 @@ function resume() {
     displayText = lastDisplayText;
     paused = false;
     gameLoop = startLoop();
+    Sound.resumeAll();
 }
 
 // Draw text at center of screen
@@ -377,6 +384,7 @@ function centerSubText(text){
 // Game end
 function end(){
     gameOver = true;
+    Sound.stopAll();
 }
 
 // Start game
@@ -394,6 +402,7 @@ function start(){
     displayText = "";
     lastDisplayText = "";
     showCenterText = false;
+    Sound.play("bg");
 
     // Countdown from 3
     var cd = 3;
