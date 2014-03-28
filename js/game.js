@@ -67,7 +67,7 @@ $(function(){
         this.x = 150;
         this.y = CANVAS_HEIGHT - this.height;
         this.velX = 0;
-        this.friction = 0.96;
+        this.friction = 0.94;
         this.spriteL = Sprite("toiletLBig", 0, 0, 238, 338);
         this.spriteR = Sprite("toiletRBig", 0, 0, 238, 338);
         this.direction = 1; // -1 is for left, 1 is for right;
@@ -92,12 +92,12 @@ $(function(){
 
             if (keys[39]) { // right
                 if (this.velX < TOILET_MAX_SPEED) {
-                    this.velX++;
+                    this.velX += TOILET_ACCELERATION;
                 }
             }
             if (keys[37]) { // left
                 if (this.velX > -TOILET_MAX_SPEED) {
-                    this.velX--;
+                    this.velX -= TOILET_ACCELERATION;
                 }
             }
 
@@ -197,7 +197,7 @@ $(function(){
 //                I.age++;
 
             // For vertical acceleration
-            I.yVelocity += I.age / 200;
+            I.yVelocity += I.age * PLUNGER_ACCELERATION;
             I.age++;
 
             I.alive = I.alive && I.inBounds();
