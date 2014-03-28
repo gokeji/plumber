@@ -1,6 +1,6 @@
-var Sound = (function ($) {
+var Sound2 = (function ($) {
 //  var format = $.browser.webkit ? ".mp3" : ".wav";
-    var format = ".wav";
+//    var format = ".wav";
     var soundPath = "sounds/";
     var sounds = {};
     var maxChan = 4;
@@ -8,7 +8,7 @@ var Sound = (function ($) {
     function loadSoundChannel(name, loop) {
         var sound = $('<audio />').get(0);
         sound.preload = "auto";
-        sound.src = soundPath + name + format;
+        sound.src = soundPath + name;
         if (loop) {
             sound.loop = true;
         }
@@ -16,24 +16,24 @@ var Sound = (function ($) {
         return sound;
     }
 
-    function Sound(name, maxChannels) {
+    function Sound2(name, maxChannels) {
         maxChan = maxChannels;
 
         return {
-            play: Sound.play,
+            play: Sound2.play,
 
             stop: function () {
-                Sound.stop(name);
+                Sound2.stop(name);
             },
 
-            pauseAll: Sound.pauseAll,
+            pauseAll: Sound2.pauseAll,
 
-            preload: Sound.preload
+            preload: Sound2.preload
 
         }
     }
 
-    return $.extend(Sound, {
+    return $.extend(Sound2, {
         play: function (name, maxChannels) {
             if (muted) return; // TODO also pause current sounds
             // Note: Too many channels crash browsers
