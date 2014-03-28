@@ -32,21 +32,21 @@ var Sound = function(){
                 Sound.nowPlaying[name] = sClone;
 
                 if(loop){
-                    console.log(name + ' needs loop');
+//                    console.log(name + ' needs loop');
 //                    sClone.loop = true;
                     $(sClone).bind('ended', function(){
                         // play again
-                        console.log('restarting');
+//                        console.log('restarting');
                         if (window.chrome) {
                             sClone.load();
                         }
                         sClone.play();
                     });
                 } else {
-                    console.log(name + ' DONT need loop');
+//                    console.log(name + ' DONT need loop');
                     $(sClone).bind('ended', function(){
                         // remove from nowPlaying
-                        console.log('deleting sound '+name);
+//                        console.log('deleting sound '+name);
                         delete Sound.nowPlaying[name];
                     });
                 }

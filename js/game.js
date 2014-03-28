@@ -15,7 +15,7 @@ $(function(){
     var freq = [0.66, 1, 1.2, 1.3, 1.4, 1.5]; // Plungers per second for each level
     var fallSpeed = [4, 4, 5, 5, 6, 6, 7]; // Plungers falling speed for each level
     var score = 0;
-    var maxHP = 3;
+    var maxHP = 30;
     var HP = maxHP;
     var level = 1;
     var remainingTime = TIME_PER_LEVEL;
@@ -48,7 +48,7 @@ $(function(){
     Sound = new Sound();
 
     $(Sound).bind("loaded", function(){
-        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        clearCanvas();
         ctx.save();
         ctx.font = "50px Arial";
         ctx.textAlign = "center";
@@ -74,19 +74,29 @@ $(function(){
 
         Sound.load(src, id, callback);
     }
+
+    $(window).blur(function(){
+        pause();
+        console.log("window blurred");
+    });
+    $(window).focus(function(){
+//        resume();
+        console.log("window focused");
+    });
     // TODO Add game loading bar
 
 
     // ====== Setting Game Loop ======
+    var gameLoop = null;
 
     var startLoop = function(){
+        console.log("++++starting Loop++++");
         return setInterval(function() {
             update();
             draw();
         }, 1000/FPS);
     }
 
-    var gameLoop = null;
     //var gameLoop = startLoop();
     //gameGoing = true;
     //gameOver = false;
@@ -97,27 +107,28 @@ $(function(){
     // ====== Toilet object constructor =======
     function Toilet(){
         this.width= 238;
-        this.height= 338;
+        this.height= 249;
         this.x = 150;
         this.y = CANVAS_HEIGHT - this.height;
         this.velX = 0;
         this.friction = 0.94;
-        this.spriteL = Sprite("toiletLBig", 0, 0, 238, 338);
-        this.spriteR = Sprite("toiletRBig", 0, 0, 238, 338);
+        this.spriteL = Sprite("toiletLNew", 0, 0, 238, 249);
+        this.spriteR = Sprite("toiletRNew", 0, 0, 238, 249);
+        this.frontSpace = 15;
         this.direction = 1; // -1 is for left, 1 is for right;
 
         this.hole = function(){
             if(this.direction == 1){ //return hole location for right-facing toilet
                 return {
-                    x1 : 86,
-                    x2 : 205,
-                    y : 221
+                    x1 : 84,
+                    x2 : 182,
+                    y : 131
                 };
             } else { // return hole location for left-facing toilet
                 return {
-                    x1 : 33,
-                    x2 : 152,
-                    y : 221
+                    x1 : 56,
+                    x2 : 187,
+                    y : 131
                 };
             }
         }
@@ -138,11 +149,11 @@ $(function(){
             this.velX *= this.friction;
             this.x += this.velX;
 
-            if (this.x >= CANVAS_WIDTH - this.width) {
-                this.x = CANVAS_WIDTH - this.width;
+            if (this.x >= CANVAS_WIDTH - this.width + this.frontSpace) {
+                this.x = CANVAS_WIDTH - this.width + this.frontSpace;
                 this.velX *= -0.8;
-            } else if (this.x <= 0) {
-                this.x = 0;
+            } else if (this.x <= -this.frontSpace) {
+                this.x = -this.frontSpace;
                 this.velX *= -0.8;
             }
 
@@ -154,13 +165,14 @@ $(function(){
         }
 
         this.draw = function(){
+                    ctx.fillStyle = "blue";
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
             if(this.velX > 0){
                 this.spriteR.draw(ctx, this.x, this.y, this.width, this.height);
             } else {
                 this.spriteL.draw(ctx, this.x, this.y, this.width, this.height);
             }
-    //        ctx.fillStyle = "blue";
-    //        ctx.fillRect(this.x, this.y, this.width, this.height);
+
 
             ctx.font = "12pt Arial";
     //        ctx.fillText("direction: "+this.direction, CANVAS_WIDTH - 400 , 150);
@@ -255,7 +267,7 @@ $(function(){
 
     // Main draw function
     function draw() {
-        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        clearCanvas();
 
         // - BACKGROUND -
 
@@ -307,11 +319,13 @@ $(function(){
         // pause game if paused
         if(paused){
             window.clearInterval(gameLoop);
+            console.log("====Ending loop====");
             var lastDisplayText = displayText;
             displayText = "PAUSED";
             centerText();
         } else if(gameOver){ // End game if ended
             window.clearInterval(gameLoop);
+            console.log("====Ending loop====");
             displayText = "GAME OVER";
             centerText();
             centerSubText("Press spacebar to play again.");
@@ -379,13 +393,19 @@ $(function(){
         } else if(e.keyCode == 32) {
             if(gameOver){
                 start();
+            } else {
+                resume();
             }
+        } else if(e.keyCode == 37) {
+            resume();
+        } else if(e.keyCode == 39) {
+            resume();
         }
     });
 
     // Pause game
     function pause(){
-        if(!gameOver && gameGoing) {
+        if(!gameOver && !paused) {
             paused = true;
             Sound.pauseAll();
             Sound.play("pause");
@@ -453,7 +473,7 @@ $(function(){
 
         var countDown = function(){
             if(cd > 0){
-                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                clearCanvas();
                 ctx.fillText(cd, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2);
                 cd--;
                 Sound.play("click");
@@ -488,5 +508,10 @@ $(function(){
         setTimeout(function(){ //stop display of new level after 1.5 seconds
             showCenterText = false;
         }, 2000);
+    }
+
+    // Clears the canvas, or covers it with background image
+    function clearCanvas(){
+        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 });
