@@ -30,10 +30,12 @@ $(function(){
     var backgroundColor = "white";
     var paused = false;
     var gameGoing = false;
+    var initialLoad = true;
 
     var soundURL = "sounds/";
     var soundsToLoad = ["applauseFlush.mp3", "bg.wav", "click.mp3", "coin.mp3", "down.mp3", "gameover.mp3", "pause.mp3", "up.mp3"];
-//    var soundIDs = ["applauseFlush", "bg", "click", "coin", "down", "gameover", "pause", "up"];
+
+    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // Setup Screen
 
@@ -165,8 +167,8 @@ $(function(){
         }
 
         this.draw = function(){
-                    ctx.fillStyle = "blue";
-                    ctx.fillRect(this.x, this.y, this.width, this.height);
+//                    ctx.fillStyle = "blue";
+//                    ctx.fillRect(this.x, this.y, this.width, this.height);
             if(this.velX > 0){
                 this.spriteR.draw(ctx, this.x, this.y, this.width, this.height);
             } else {
@@ -190,14 +192,14 @@ $(function(){
 //        I.age = Math.floor(Math.random() * 128);
         I.age = 0;
 
-        I.x = CANVAS_WIDTH / 4 + Math.random() * CANVAS_WIDTH / 2;
-        I.y = 50;
-        I.xVelocity = 0
-        I.yVelocity = getVal(fallSpeed, level-1);
+        I.width = 40;
+        I.height = 100;
+        I.sprite = Sprite("plungerNew", 0, 0, 100, 253);
 
-        I.width = 20;
-        I.height = 55;
-        I.sprite = Sprite("plunger2", 0, 0, 42, 114);
+        I.x = CANVAS_WIDTH / 4 + Math.random() * CANVAS_WIDTH / 2;
+        I.y = 0;
+        I.xVelocity = 0;
+        I.yVelocity = getVal(fallSpeed, level-1);
 
         I.inBounds = function() {
             return I.x >= 0 && I.x <= CANVAS_WIDTH &&
@@ -371,7 +373,7 @@ $(function(){
 
     // detection for whether the item fell straight into the toilet
     function collides(t, item) {
-        var fallThreshold = 10; // height of the hitbox of the item falling into toilet
+        var fallThreshold = 15; // height of the hitbox of the item falling into toilet
         return t.x + t.hole().x1 < item.x &&
             t.x + t.hole().x2 > item.x + item.width &&
             t.y + t.hole().y < item.y + item.height &&
@@ -405,7 +407,7 @@ $(function(){
 
     // Pause game
     function pause(){
-        if(!gameOver && !paused) {
+        if(!gameOver && !paused && gameGoing) {
             paused = true;
             Sound.pauseAll();
             Sound.play("pause");
@@ -472,7 +474,7 @@ $(function(){
         ctx.textBaseline = "middle";
 
         var countDown = function(){
-            if(cd > 0){
+            if(cd > 0 && initialLoad){
                 clearCanvas();
                 ctx.fillText(cd, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2);
                 cd--;
@@ -483,6 +485,7 @@ $(function(){
                 Sound.play("bg", true);
                 gameLoop = startLoop();
                 gameGoing = true;
+                initialLoad = false;
             }
         }
 
@@ -513,5 +516,6 @@ $(function(){
     // Clears the canvas, or covers it with background image
     function clearCanvas(){
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        bg.draw(ctx, 0, 0);
     }
 });
