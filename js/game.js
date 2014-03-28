@@ -32,9 +32,9 @@ $(function(){
     var gameGoing = false;
 
     //// preload sounds
-    //Sound.preload(["bg.wav"], true);
     Sound = new Sound();
     Sound.init();
+    // TODO Add game loading bar
 
     // ====== Setting Game Loop ======
 
@@ -72,11 +72,6 @@ $(function(){
         this.spriteR = Sprite("toiletRBig", 0, 0, 238, 338);
         this.direction = 1; // -1 is for left, 1 is for right;
 
-    //    this.hole = {
-    //        x1 : 35,
-    //        x2 : 84,
-    //        y : 96
-    //    };
         this.hole = function(){
             if(this.direction == 1){ //return hole location for right-facing toilet
                 return {
@@ -146,7 +141,8 @@ $(function(){
 
         I.alive = true;
         I.scored = false;
-        I.age = Math.floor(Math.random() * 128);
+//        I.age = Math.floor(Math.random() * 128);
+        I.age = 0;
 
         I.x = CANVAS_WIDTH / 4 + Math.random() * CANVAS_WIDTH / 2;
         I.y = 50;
@@ -184,8 +180,6 @@ $(function(){
 
         I.update = function() {
 
-            I.yVelocity = getVal(fallSpeed, level-1);
-
             if(I.scored){
 
                 I.yVelocity *= 1.5;
@@ -195,12 +189,16 @@ $(function(){
                     I.xVelocity *= -0.9;
                 }
             }
-            I.x += I.xVelocity;
+//            I.x += I.xVelocity;
             I.y += I.yVelocity;
 
                 // For swirling
-                I.xVelocity = 3 * Math.sin(I.age * Math.PI / 64);
-                I.age++;
+//                I.xVelocity = 3 * Math.sin(I.age * Math.PI / 64);
+//                I.age++;
+
+            // For vertical acceleration
+            I.yVelocity += I.age / 200;
+            I.age++;
 
             I.alive = I.alive && I.inBounds();
 
@@ -208,11 +206,12 @@ $(function(){
                 if(!I.scored){
                     score++;
                     I.scored = true;
-    //                Sound.play("explosion");
+                    Sound.play("coin", false, 0.5);
                 }
 
             } else if(!I.inBounds() && !I.scored) {
                 HP--;
+                Sound.play("down");
             }
 
         };
@@ -281,7 +280,7 @@ $(function(){
             window.clearInterval(gameLoop);
             displayText = "GAME OVER";
             centerText();
-            centerSubText("Press spacebar to play again.")
+            centerSubText("Press spacebar to play again.");
         } else if(showCenterText){
             centerText();
         }
@@ -295,9 +294,10 @@ $(function(){
         if(remainingTime <= 0){
             remainingTime += TIME_PER_LEVEL;
             level++;
-            Sound.play("applauseFlush")
+            Sound.play("applauseFlush");
             newLevel();
             HP = maxHP;
+            Sound.play("up.mp3");
         }
 
         // ========== Toilet movement ==========

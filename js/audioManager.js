@@ -11,8 +11,9 @@ var Sound = function(){
         });
     }
 
-    this.play = function(name, loop){
+    this.play = function(name, loop, volume){
         loop = loop || false;
+        volume = volume || 1;
         if(Sound.muted)
             return;
         else{
@@ -20,6 +21,7 @@ var Sound = function(){
             if(s){
                 var sClone = s.cloneNode(true);
                 Sound.nowPlaying[name] = sClone;
+
                 if(loop){
                     console.log(name + ' needs loop');
 //                    sClone.loop = true;
@@ -40,6 +42,7 @@ var Sound = function(){
                     });
                 }
 
+                sClone.volume = volume;
                 sClone.play();
             }
         }
@@ -82,12 +85,14 @@ var Sound = function(){
     }
 
     this.mute = function(){
-        // muted handling
+        // TODO muted handling
     }
 
     this.unmute = function(){
 
     }
+
+
 }
 
 
