@@ -36,7 +36,7 @@ $(function(){
     var initialLoad = true;
 
     var soundURL = "sounds/";
-    var soundsToLoad = ["applauseFlush.ogg", "bg.ogg", "click.ogg", "coin.ogg", "down.ogg", "gameover.ogg", "pause.ogg", "up.ogg"];
+    var soundsToLoad = ["bg.ogg", "applauseFlush.ogg","click.ogg", "coin.ogg", "down.ogg", "gameover.ogg", "pause.ogg", "up.ogg"];
 
 //    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -52,19 +52,29 @@ $(function(){
         ctx.textBaseline = "middle";
         ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
         ctx.restore();
+
+        setTimeout(function(){ // If game doesn't load in 3 seconds, start game
+           if(gameover && !soundsLoaded) {
+               start();
+           }
+        }, 3000);
     }
 
     function loadedScreen(){
-        draw(true);
-        ctx.save();
-        ctx.fillStyle = "white";
-        ctx.font = "50px Helvetica";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("Loaded", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-        ctx.font = "30px Helvetica";
-        ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 60);
-        ctx.restore();
+        if(gameOver){
+            start();
+//            draw(true);
+//            ctx.save();
+//            ctx.fillStyle = "white";
+//            ctx.font = "50px Helvetica";
+//            ctx.textAlign = "center";
+//            ctx.textBaseline = "middle";
+//            ctx.fillText("Loaded", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+//            ctx.font = "30px Helvetica";
+//            ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 60);
+//            ctx.restore();
+            console.log("loaded screen display");
+        }
     }
 
     // Setup Screen
@@ -80,9 +90,9 @@ $(function(){
     // preload sounds
 //    Sound = new Sound();
     Sounds = {};
-    if(is_firefox){ // prefer HTMLAudio over WebAudio
-        createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
-    }
+//    if(is_firefox){ // prefer HTMLAudio over WebAudio
+//        createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
+//    }
 
 //    $(Sound).bind("loaded", function(){
 //        soundsLoaded = true;
