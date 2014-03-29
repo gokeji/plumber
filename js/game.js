@@ -13,7 +13,7 @@ $(function(){
     var keys = [];
 
     var freq = [0.66, 1, 1.2, 1.3, 1.4, 1.5]; // Plungers per second for each level
-    var fallSpeed = [4, 4, 5, 5, 6, 6, 7]; // Plungers falling speed for each level
+    var fallSpeed = [4, 4, 5, 5, 6, 6, 7, 7]; // Plungers falling speed for each level
     var score = 0;
     var maxHP = 5;
     var HP = maxHP;
@@ -39,7 +39,8 @@ $(function(){
 
     // Setup Screen
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "#aaa";
+    clearCanvas();
     ctx.save();
     ctx.font = "50px Helvetica";
     ctx.textAlign = "center";
@@ -67,13 +68,13 @@ $(function(){
         var id = src.split(".", 1); console.log(id);
         src = soundURL + soundsToLoad[i];
 
-        var callback = construct(src);
-
         function construct(src){
             return function(){
                 console.log("loaded "+ src);
             };
         }
+
+        var callback = construct(src);
 
         Sound.load(src, id, callback);
     }
@@ -197,7 +198,7 @@ $(function(){
         I.height = 100;
         I.sprite = Sprite("plungerNew", 0, 0, 100, 253);
 
-        I.x = CANVAS_WIDTH / 4 + Math.random() * CANVAS_WIDTH / 2;
+        I.x = 50 + Math.random() * (CANVAS_WIDTH - 100);
         I.y = 0;
         I.xVelocity = 0;
         I.yVelocity = getVal(fallSpeed, level-1);
@@ -376,7 +377,7 @@ $(function(){
 
     // detection for whether the item fell straight into the toilet
     function collides(t, item) {
-        var fallThreshold = 15; // height of the hitbox of the item falling into toilet
+        var fallThreshold = 35; // height of the hitbox of the item falling into toilet
         return t.x + t.hole().x1 < item.x &&
             t.x + t.hole().x2 > item.x + item.width &&
             t.y + t.hole().y < item.y + item.height &&
@@ -520,5 +521,6 @@ $(function(){
     function clearCanvas(){
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         bg.draw(ctx, 0, 0);
+        console.log("drawn background");
     }
 });
