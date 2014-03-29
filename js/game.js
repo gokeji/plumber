@@ -6,6 +6,8 @@ $(function(){
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
+    var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
     var FPS = 50;
     var counter = 0;
     var t = new Toilet();
@@ -76,27 +78,45 @@ $(function(){
     });
 
     // preload sounds
-    Sound = new Sound();
+//    Sound = new Sound();
+    Sounds = {};
+//    if(is_firefox){ // prefer HTMLAudio over WebAudio
+//        createjs.Sound.registerPlugins([createjs.HTMLAudioPlugin, createjs.WebAudioPlugin, createjs.FlashPlugin]);
+//    }
 
-    $(Sound).bind("loaded", function(){
+//    $(Sound).bind("loaded", function(){
         soundsLoaded = true;
-        loadedScreen();
-    })
+        if(soundsLoaded){
+            loadedScreen();
+        } else {
+            loadingScreen();
+        }
+//    })
 
     for (var i = 0; i < soundsToLoad.length; i++){
         var src = soundsToLoad[i];
         var id = src.split(".", 1);
         src = soundURL + soundsToLoad[i];
 
-//        function construct(src){
-//            return function(){
-//                console.log("loaded "+ src);
+//        function construct(id){
+//            return function(event){
+//                var id =
+//                console.log("loaded "+ event.id[0]);
+//                console.log(event);
 //            };
 //        }
-//
-//        var callback = construct(src);
 
-        Sound.load(src, id);
+        var callback = function(event){
+            var id = event.id[0];
+            console.log("loaded "+ id);
+//            console.log(event);
+            var instance = createjs.Sound.createInstance(id);
+            Sounds[id] = instance;
+//            console.log(instance);
+        };
+
+        createjs.Sound.addEventListener("fileload", callback);
+        createjs.Sound.registerSound(src, id);
     }
 
     $(window).blur(function(){
@@ -286,12 +306,12 @@ $(function(){
                 if(!I.scored){
                     score++;
                     I.scored = true;
-                    Sound.play("coin", false, 0.5);
+                    createjs.Sound.play("coin", {volume:0.5});
                 }
 
             } else if(!I.inBounds() && !I.scored) {
                 HP--;
-                Sound.play("down");
+                createjs.Sound.play("down");
             }
 
         };
@@ -336,7 +356,8 @@ $(function(){
         //Draw pause instructions
         ctx.font = "10pt Helvetica";
         ctx.fillStyle = "white";
-        ctx.fillText("P: Pause/Resume", CANVAS_WIDTH - 100, CANVAS_HEIGHT - 30);
+        ctx.fillText("P: Pause / Resume", CANVAS_WIDTH - 80, CANVAS_HEIGHT - 25);
+        ctx.fillText("M: Mute / Unmute", CANVAS_WIDTH - 85, CANVAS_HEIGHT - 45);
 
 
         // - Plungers -
@@ -377,10 +398,10 @@ $(function(){
         if(remainingTime <= 0){
             remainingTime += TIME_PER_LEVEL;
             level++;
-            Sound.play("applauseFlush");
+            createjs.Sound.play("applauseFlush");
             newLevel();
             HP = maxHP;
-            Sound.play("up.mp3");
+            createjs.Sound.play("up.mp3");
         }
 
         // ========== Toilet movement ==========
@@ -435,6 +456,12 @@ $(function(){
             resume();
         } else if(e.keyCode == 39) {
             resume();
+        } else if(e.keyCode == 77) { // toggle mute
+            if(muted){
+                unmute();
+            } else {
+                mute();
+            }
         }
     });
 
@@ -442,8 +469,7 @@ $(function(){
     function pause(){
         if(!gameOver && !paused && gameGoing) {
             paused = true;
-            Sound.pauseAll();
-            Sound.play("pause");
+            createjs.Sound.play("pause");
         }
     }
 
@@ -454,7 +480,6 @@ $(function(){
         displayText = lastDisplayText;
         paused = false;
         gameLoop = startLoop();
-        Sound.resumeAll();
     }
 
     // Draw text at center of screen
@@ -480,8 +505,8 @@ $(function(){
         gameOver = true;
         gameGoing = false;
         highscore = score;
-        Sound.stopAll();
-        Sound.play("gameover");
+        createjs.Sound.stop();
+        createjs.Sound.play("gameover");
     }
 
     // Start game
@@ -515,11 +540,11 @@ $(function(){
                 draw(true);
                 ctx.fillText(cd, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2);
                 cd--;
-                Sound.play("click");
+                createjs.Sound.play("click");
                 setTimeout(countDown, 1000);
             } else { // start actual game!
                 ctx.restore();
-                Sound.play("bg", true);
+                createjs.Sound.play("bg", {loop: -1});
                 gameLoop = startLoop();
                 gameGoing = true;
                 initialLoad = false;
@@ -555,4 +580,26 @@ $(function(){
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         bg.draw(ctx, 0, 0);
     }
+
+    function mute(){
+        createjs.Sound.setMute(true);
+        muted = true;
+    }
+
+    function unmute(){
+        createjs.Sound.setMute(false);
+        muted = false;
+    }
+//    function pauseAllSounds(){
+//        for(var id in Sounds){
+//            Sounds[id].pause();
+//            console.log('pausing '+id);
+//        }
+//    }
+//
+//    function resumeAllSounds(){
+//        for(var id in Sounds){
+//            Sounds[id].play();
+//        }
+//    }
 });
