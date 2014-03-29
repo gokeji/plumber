@@ -13,6 +13,8 @@ var Sound = function(){
             Sound.loadedCount ++;
             console.log("Loaded "+src);
             loadedCallback();
+            console.log("loaded count = "+Sound.loadedCount);
+            console.log("Object keys length = "+ Object.keys(Sound.sounds).length);
             if(Sound.loadedCount == Object.keys(Sound.sounds).length){
                 $(Sound).trigger("loaded");
                 console.log("FINISHED LOADING SOUNDS");
