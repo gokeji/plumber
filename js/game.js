@@ -123,6 +123,7 @@ $(function(){
             }
         };
 
+        console.log("loading "+id);
         createjs.Sound.addEventListener("fileload", callback);
         createjs.Sound.registerSound(src, id);
     }
@@ -142,7 +143,6 @@ $(function(){
     var gameLoop = null;
 
     var startLoop = function(){
-        console.log("++++starting Loop++++");
         return setInterval(function() {
             update();
             draw();
@@ -329,14 +329,16 @@ $(function(){
 
     // Main draw function
     function draw(initial) {
-        var initial = initial || false;
+        initial = initial || false;
 
         ctx.save();
         // - BACKGROUND -
         clearCanvas();
 
         // - FOREGROUND -
-        if(!initial) t.draw();
+        if(!initial) {
+            t.draw();
+        }
 
 
         // - OVERLAY -
@@ -400,8 +402,9 @@ $(function(){
 
 
         // end game if no more HP
-        if(HP <= 0)
+        if(HP <= 0) {
             end();
+        }
 
         if(remainingTime <= 0){
             remainingTime += TIME_PER_LEVEL;
@@ -483,8 +486,9 @@ $(function(){
 
     // Resume game
     function resume() {
-        if(gameOver || !paused)
+        if(gameOver || !paused) {
             return;
+        }
         displayText = lastDisplayText;
         paused = false;
         gameLoop = startLoop();
