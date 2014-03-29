@@ -39,7 +39,7 @@ $(function(){
 
     // Setup Screen
 
-    ctx.fillStyle = "#aaa";
+    ctx.fillStyle = "#ddd";
     clearCanvas();
     ctx.save();
     ctx.font = "50px Helvetica";
@@ -65,27 +65,27 @@ $(function(){
 
     for (var i = 0; i < soundsToLoad.length; i++){
         var src = soundsToLoad[i];
-        var id = src.split(".", 1); console.log(id);
+        var id = src.split(".", 1);
         src = soundURL + soundsToLoad[i];
 
-        function construct(src){
-            return function(){
-                console.log("loaded "+ src);
-            };
-        }
+//        function construct(src){
+//            return function(){
+//                console.log("loaded "+ src);
+//            };
+//        }
+//
+//        var callback = construct(src);
 
-        var callback = construct(src);
-
-        Sound.load(src, id, callback);
+        Sound.load(src, id);
     }
 
     $(window).blur(function(){
         pause();
-        console.log("window blurred");
+//        console.log("window blurred");
     });
     $(window).focus(function(){
 //        resume();
-        console.log("window focused");
+//        console.log("window focused");
     });
     // TODO Add game loading bar
 
@@ -210,7 +210,7 @@ $(function(){
         };
 
         I.draw = function() {
-            ctx.fillStyle = "black";
+            ctx.fillStyle = "white";
             if(I.scored){
                 if(this.y <= t.y + t.hole().y){
                     I.sprite.draw(ctx, this.x, this.y, this.width, t.y + t.hole().y - this.y);
@@ -272,16 +272,12 @@ $(function(){
 
     // Main draw function
     function draw() {
-        clearCanvas();
 
         // - BACKGROUND -
-
+        clearCanvas();
 
         // - FOREGROUND -
         t.draw();
-        plungers.forEach(function(plunger) {
-            plunger.draw();
-        });
 
 
         // - OVERLAY -
@@ -291,11 +287,10 @@ $(function(){
 //        ctx.fillText("Score:", CANVAS_WIDTH - 170 , 40);
         ctx.font = "24pt Helvetica";
         ctx.fillText("Health", 440 , 30);
-        drawHP(392, 53, 32, 38, 3);
+        drawHP(392, 53, 32, 38, 7);
 
         // Level Display
 //        ctx.fillText("Level:", CANVAS_WIDTH - 170 , 90);
-
 
         // Time left for this level
 //        ctx.fillText("Next Level:", CANVAS_WIDTH - 170 , 140);
@@ -304,20 +299,17 @@ $(function(){
         ctx.textAlign = "center";
         ctx.fillText(score, 666 , 78);
         ctx.fillText(level, 777 , 78);
-//        ctx.font = "100px Helvetica";
         ctx.fillText(Math.ceil(remainingTime), 910 , 78);
-
-
 
         //Draw pause instructions
         ctx.font = "10pt Helvetica";
+        ctx.fillText("P: Pause/Resume", CANVAS_WIDTH - 100, CANVAS_HEIGHT - 30);
 
-    //    ctx.textBaseline = "top"
-    //    ctx.shadowColor = "#666"
-    //    ctx.shadowOffsetX = 1;
-    //    ctx.shadowOffsetY = 1;
-    //    ctx.shadowBlur = 3;
-        ctx.fillText("P: Pause/Resume", CANVAS_WIDTH - 130, CANVAS_HEIGHT - 30);
+
+        // - Plungers -
+        plungers.forEach(function(plunger) {
+            plunger.draw();
+        });
 
         // end game if no more HP
         if(HP <= 0)
@@ -326,19 +318,19 @@ $(function(){
         // pause game if paused
         if(paused){
             window.clearInterval(gameLoop);
-            console.log("====Ending loop====");
             var lastDisplayText = displayText;
             displayText = "PAUSED";
             centerText();
         } else if(gameOver){ // End game if ended
             window.clearInterval(gameLoop);
-            console.log("====Ending loop====");
             displayText = "GAME OVER";
             centerText();
             centerSubText("Press spacebar to play again.");
         } else if(showCenterText){
             centerText();
         }
+
+
     }
 
     // Main update function
@@ -522,6 +514,5 @@ $(function(){
     function clearCanvas(){
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         bg.draw(ctx, 0, 0);
-        console.log("drawn background");
     }
 });

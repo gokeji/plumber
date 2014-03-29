@@ -6,6 +6,7 @@ var Sound = function(){
 
     // Load all existing audio files into sounds
     this.load = function(src, id, loadedCallback){
+        loadedCallback = loadedCallback || function(){};
         var sound = $('<audio />').get(0);
         sound.preload = "auto";
         sound.src = src;
