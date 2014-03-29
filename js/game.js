@@ -85,12 +85,12 @@ $(function(){
 //    }
 
 //    $(Sound).bind("loaded", function(){
-        soundsLoaded = true;
-        if(soundsLoaded){
-            loadedScreen();
-        } else {
-            loadingScreen();
-        }
+//        soundsLoaded = true;
+//        if(soundsLoaded){
+//            loadedScreen();
+//        } else {
+//            loadingScreen();
+//        }
 //    })
 
     for (var i = 0; i < soundsToLoad.length; i++){
@@ -113,6 +113,14 @@ $(function(){
             var instance = createjs.Sound.createInstance(id);
             Sounds[id] = instance;
 //            console.log(instance);
+            if(id=="bg"){ // consider game loaded
+                soundsLoaded = true;
+                if(soundsLoaded){
+                    loadedScreen();
+                } else {
+                    loadingScreen();
+                }
+            }
         };
 
         createjs.Sound.addEventListener("fileload", callback);
