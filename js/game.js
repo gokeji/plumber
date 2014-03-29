@@ -15,14 +15,14 @@ $(function(){
     var freq = [0.66, 1, 1.2, 1.3, 1.4, 1.5]; // Plungers per second for each level
     var fallSpeed = [4, 4, 5, 5, 6, 6, 7]; // Plungers falling speed for each level
     var score = 0;
-    var maxHP = 30;
+    var maxHP = 5;
     var HP = maxHP;
     var level = 1;
     var remainingTime = TIME_PER_LEVEL;
     var gameOver = true;
 
-    var toiletGrey = Sprite("toilet-grey", 0, 0, 50, 50); // HP toilet icon
-    var toiletRed = Sprite("toilet-red", 0, 0, 50, 50); // HP toilet icon
+    var toiletGrey = Sprite("hp", 0, 0, 50, 59); // HP toilet icon
+    var toiletRed = Sprite("hp2", 0, 0, 50, 59); // HP toilet icon
     var muted = false;
     var displayText = "";
     var lastDisplayText = "";
@@ -39,8 +39,9 @@ $(function(){
 
     // Setup Screen
 
+    ctx.fillStyle = "white";
     ctx.save();
-    ctx.font = "50px Arial";
+    ctx.font = "50px Helvetica";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
@@ -52,11 +53,11 @@ $(function(){
     $(Sound).bind("loaded", function(){
         clearCanvas();
         ctx.save();
-        ctx.font = "50px Arial";
+        ctx.font = "50px Helvetica";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("Loaded", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-        ctx.font = "30px Arial";
+        ctx.font = "30px Helvetica";
         ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 70);
         ctx.restore();
     })
@@ -176,7 +177,7 @@ $(function(){
             }
 
 
-            ctx.font = "12pt Arial";
+            ctx.font = "12pt Helvetica";
     //        ctx.fillText("direction: "+this.direction, CANVAS_WIDTH - 400 , 150);
     //        ctx.fillText("plunger y: "+this.y, CANVAS_WIDTH - 150 , 150);
 
@@ -219,7 +220,7 @@ $(function(){
             }
 
     //        ctx.fillRect(this.x, this.y, this.width, this.height);
-    //        ctx.font = "12pt Arial";
+    //        ctx.font = "12pt Helvetica";
     //        ctx.fillText("plunger x: "+this.x, CANVAS_WIDTH - 400 , 150);
     //        ctx.fillText("plunger y: "+this.y, CANVAS_WIDTH - 150 , 150);
     //        ctx.fillText("plunger x: "+this.width, CANVAS_WIDTH - 400 , 250);
@@ -282,30 +283,32 @@ $(function(){
 
 
         // - OVERLAY -
-        ctx.fillStyle = "black";
-        ctx.font = "20pt Arial";
+        ctx.fillStyle = "white";
+        ctx.font = "20pt Helvetica";
         ctx.textBaseline = "middle";
-        ctx.fillText("Score:", CANVAS_WIDTH - 170 , 40);
-        ctx.fillText("Health: ", CANVAS_WIDTH - 450 , 40);
-        drawHP(CANVAS_WIDTH - 350, 20, 40, 40, 8, 3);
+//        ctx.fillText("Score:", CANVAS_WIDTH - 170 , 40);
+        ctx.font = "24pt Helvetica";
+        ctx.fillText("Health", 440 , 30);
+        drawHP(392, 53, 32, 38, 3);
 
         // Level Display
-        ctx.fillText("Level:", CANVAS_WIDTH - 170 , 90);
+//        ctx.fillText("Level:", CANVAS_WIDTH - 170 , 90);
 
 
         // Time left for this level
-        ctx.fillText("Next Level:", CANVAS_WIDTH - 170 , 140);
+//        ctx.fillText("Next Level:", CANVAS_WIDTH - 170 , 140);
 
-        ctx.font = "30pt Arial";
-        ctx.fillText(score, CANVAS_WIDTH - 80 , 40);
-        ctx.fillText(level, CANVAS_WIDTH - 80 , 90);
-        ctx.font = "100px Arial";
-        ctx.fillText(Math.ceil(remainingTime), CANVAS_WIDTH - 130 , 220);
+        ctx.font = "26pt Helvetica";
+        ctx.textAlign = "center";
+        ctx.fillText(score, 666 , 78);
+        ctx.fillText(level, 777 , 78);
+//        ctx.font = "100px Helvetica";
+        ctx.fillText(Math.ceil(remainingTime), 910 , 78);
 
 
 
         //Draw pause instructions
-        ctx.font = "10pt Arial";
+        ctx.font = "10pt Helvetica";
 
     //    ctx.textBaseline = "top"
     //    ctx.shadowColor = "#666"
@@ -427,7 +430,7 @@ $(function(){
     // Draw text at center of screen
     function centerText(){
         ctx.save();
-        ctx.font = "30pt Arial";
+        ctx.font = "30pt Helvetica";
         ctx.textAlign = "center";
         ctx.fillText(displayText, CANVAS_WIDTH/2 , CANVAS_HEIGHT/3);
         ctx.restore();
@@ -436,7 +439,7 @@ $(function(){
     // Draw subtext at center of screen
     function centerSubText(text){
         ctx.save();
-        ctx.font = "20pt Arial";
+        ctx.font = "20pt Helvetica";
         ctx.textAlign = "center";
         ctx.fillText(text, CANVAS_WIDTH/2 , CANVAS_HEIGHT/3 + 40);
         ctx.restore();
@@ -469,7 +472,7 @@ $(function(){
         var cd = 3;
 
         ctx.save();
-        ctx.font = "150px Arial";
+        ctx.font = "150px Helvetica";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
