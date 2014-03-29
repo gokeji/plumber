@@ -120,6 +120,7 @@ $(function(){
         this.spriteR = Sprite("toiletRNew", 0, 0, 238, 249);
         this.frontSpace = 15;
         this.direction = 1; // -1 is for left, 1 is for right;
+        this.bounce = 0.5;
 
         this.hole = function(){
             if(this.direction == 1){ //return hole location for right-facing toilet
@@ -155,10 +156,10 @@ $(function(){
 
             if (this.x >= CANVAS_WIDTH - this.width + this.frontSpace) {
                 this.x = CANVAS_WIDTH - this.width + this.frontSpace;
-                this.velX *= -0.8;
+                this.velX *= -this.bounce;
             } else if (this.x <= -this.frontSpace) {
                 this.x = -this.frontSpace;
-                this.velX *= -0.8;
+                this.velX *= -this.bounce;
             }
 
             if(this.velX > 0){
@@ -198,7 +199,7 @@ $(function(){
         I.height = 100;
         I.sprite = Sprite("plungerNew", 0, 0, 100, 253);
 
-        I.x = 50 + Math.random() * (CANVAS_WIDTH - 100);
+        I.x = 100 + Math.random() * (CANVAS_WIDTH - 200);
         I.y = 0;
         I.xVelocity = 0;
         I.yVelocity = getVal(fallSpeed, level-1);
