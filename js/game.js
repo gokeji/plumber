@@ -115,7 +115,7 @@ $(function(){
 //            console.log(instance);
             if(id=="bg"){ // consider game loaded
                 soundsLoaded = true;
-                if(soundsLoaded){
+                if(imagesLoaded){
                     loadedScreen();
                 } else {
                     loadingScreen();
