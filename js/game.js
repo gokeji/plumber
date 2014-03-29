@@ -128,14 +128,14 @@ $(function(){
         this.hole = function(){
             if(this.direction == 1){ //return hole location for right-facing toilet
                 return {
-                    x1 : 98,
-                    x2 : this.width - 16,
+                    x1 : 80,
+                    x2 : this.width - 10,
                     y : 160
                 };
             } else { // return hole location for left-facing toilet
                 return {
-                    x1 : 16,
-                    x2 : this.width - 98,
+                    x1 : 10,
+                    x2 : this.width - 80,
                     y : 160
                 };
             }
@@ -147,15 +147,16 @@ $(function(){
                 if (this.velX < TOILET_MAX_SPEED) {
                     this.velX += TOILET_ACCELERATION;
                 }
-            }
-            if (keys[37]) { // left
+            } else if (keys[37]) { // left
                 if (this.velX > -TOILET_MAX_SPEED) {
                     this.velX -= TOILET_ACCELERATION;
                 }
+            } else {
+                this.velX *= this.friction;
             }
 
-            this.velX *= this.friction;
             this.x += this.velX;
+
 
             if (this.x >= CANVAS_WIDTH - this.width + this.frontSpace && this.direction == 1) {
                 this.x = CANVAS_WIDTH - this.width + this.frontSpace - this.turnCompensation;
@@ -209,7 +210,7 @@ $(function(){
         I.height = 100;
         I.sprite = Sprite("plunger", 0, 0, 100, 253);
 
-        I.x = 100 + Math.random() * (CANVAS_WIDTH - 200);
+        I.x = 150 + Math.random() * (CANVAS_WIDTH - 300);
         I.y = 0;
         I.xVelocity = 0;
         I.yVelocity = getVal(fallSpeed, level-1);
