@@ -26,6 +26,8 @@ $(function(){
 
     var toiletGrey = Sprite("hp", 0, 0, 50, 59); // HP toilet icon
     var toiletRed = Sprite("hp2", 0, 0, 50, 59); // HP toilet icon
+    var mutedIcon = Sprite("muted", 0, 0, 128, 128);
+    var unmutedIcon = Sprite("unmuted", 0, 0, 128, 128);
     var muted = false;
     var displayText = "";
     var lastDisplayText = "";
@@ -34,6 +36,7 @@ $(function(){
     var paused = false;
     var gameGoing = false;
     var initialLoad = true;
+    var currentCD = 5;
 
     var soundURL = "sounds/";
     var soundsToLoad = ["bg.ogg", "applauseFlush.ogg","click.ogg", "coin.ogg", "down.ogg", "gameover.ogg", "pause.ogg", "up.ogg"];
@@ -118,7 +121,7 @@ $(function(){
 
         var callback = function(event){
             var id = event.id[0];
-            console.log("loaded "+ id);
+//            console.log("loaded "+ id);
 //            console.log(event);
             var instance = createjs.Sound.createInstance(id);
             Sounds[id] = instance;
@@ -374,11 +377,17 @@ $(function(){
         ctx.fillText(score, 781 , 80);
         ctx.fillText(Math.ceil(remainingTime), 910 , 80);
 
-        //Draw pause instructions
+        //Draw pause and mute instructions
         ctx.font = "10pt Helvetica";
         ctx.fillStyle = "white";
-        ctx.fillText("P: Pause / Resume", CANVAS_WIDTH - 80, CANVAS_HEIGHT - 25);
-        ctx.fillText("M: Mute / Unmute", CANVAS_WIDTH - 85, CANVAS_HEIGHT - 45);
+        ctx.textAlign = "left";
+        ctx.fillText("P: Pause / Resume", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 25);
+        ctx.fillText("M: Mute / Unmute", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 45);
+        if(muted){
+            mutedIcon.draw(ctx, 935, 120, 50, 50);
+        } else {
+            unmutedIcon.draw(ctx, 935, 120, 50, 50);
+        }
 
 
         // - Plungers -
@@ -387,6 +396,9 @@ $(function(){
         });
 
         if(!initial){
+            if(muted){
+
+            }
             // pause game if paused
             if(paused){
                 window.clearInterval(gameLoop);
@@ -549,22 +561,25 @@ $(function(){
         showCenterText = false;
 
         // Countdown from 3
-        var cd = 3;
+        var cd = 5;
 
         ctx.save();
         ctx.fillStyle = "white";
-        ctx.font = "150px Helvetica";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
+//        demoPlunger = new plunger();
+//        demoPlunger.x = t.x + 150;
+//        demoPlunger.y = 370;
 
         var countDown = function(){
             if(cd > 0 && initialLoad){
 //                clearCanvas();
-                draw(true);
-                ctx.fillText(cd, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2);
+                currentCD = cd;
+                drawCDScreen();
                 cd--;
                 createjs.Sound.play("click");
                 setTimeout(countDown, 1000);
+
             } else { // start actual game!
                 ctx.restore();
                 createjs.Sound.play("bg", {loop: -1});
@@ -589,6 +604,16 @@ $(function(){
         }
     }
 
+    // Draws the countdown screen
+    function drawCDScreen(cd){
+        draw(true);
+        ctx.font = "150px Helvetica";
+        ctx.fillText(currentCD, CANVAS_WIDTH/2 , CANVAS_HEIGHT/3);
+        ctx.font = "16pt Helvetica";
+        ctx.fillText('Press "LEFT" and "RIGHT" keys to move toilet', CANVAS_WIDTH/2 , CANVAS_HEIGHT/3 + 120);
+        ctx.fillText('Catch plungers in the toilet hole to score', CANVAS_WIDTH/2 , CANVAS_HEIGHT/3 + 150);
+    }
+
     // Displays a new level indication
     function newLevel(){
         showCenterText = true;
@@ -600,18 +625,28 @@ $(function(){
 
     // Clears the canvas, or covers it with background image
     function clearCanvas(){
-        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+//        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         bg.draw(ctx, 0, 0);
     }
 
     function mute(){
         createjs.Sound.setMute(true);
         muted = true;
+        if(gameGoing || gameOver) {
+            draw();
+        } else if(!gameOver){
+            drawCDScreen();
+        }
     }
 
     function unmute(){
         createjs.Sound.setMute(false);
         muted = false;
+        if(gameGoing || gameOver) {
+            draw();
+        } else if(!gameOver){
+            drawCDScreen();
+        }
     }
 //    function pauseAllSounds(){
 //        for(var id in Sounds){
