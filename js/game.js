@@ -15,6 +15,7 @@ $(function(){
     var freq = [0.66, 1, 1.2, 1.3, 1.4, 1.5]; // Plungers per second for each level
     var fallSpeed = [4, 4, 5, 5, 6, 6, 7, 7]; // Plungers falling speed for each level
     var score = 0;
+    var highscore = 0;
     var maxHP = 5;
     var HP = maxHP;
     var level = 1;
@@ -53,6 +54,7 @@ $(function(){
 
     $(Sound).bind("loaded", function(){
         clearCanvas();
+        draw(true);
         ctx.save();
         ctx.font = "50px Helvetica";
         ctx.textAlign = "center";
@@ -126,15 +128,15 @@ $(function(){
         this.hole = function(){
             if(this.direction == 1){ //return hole location for right-facing toilet
                 return {
-                    x1 : 102,
-                    x2 : this.width - 20,
-                    y : 159
+                    x1 : 98,
+                    x2 : this.width - 16,
+                    y : 160
                 };
             } else { // return hole location for left-facing toilet
                 return {
-                    x1 : 20,
-                    x2 : this.width - 102,
-                    y : 159
+                    x1 : 16,
+                    x2 : this.width - 98,
+                    y : 160
                 };
             }
         }
@@ -155,11 +157,11 @@ $(function(){
             this.velX *= this.friction;
             this.x += this.velX;
 
-            if (this.x >= CANVAS_WIDTH - this.width + this.frontSpace) {
-                this.x = CANVAS_WIDTH - this.width + this.frontSpace;
+            if (this.x >= CANVAS_WIDTH - this.width + this.frontSpace && this.direction == 1) {
+                this.x = CANVAS_WIDTH - this.width + this.frontSpace - this.turnCompensation;
                 this.velX *= -this.bounce;
-            } else if (this.x <= -this.frontSpace) {
-                this.x = -this.frontSpace;
+            } else if (this.x <= -this.frontSpace && this.direction == -1) {
+                this.x = -this.frontSpace + this.turnCompensation;
                 this.velX *= -this.bounce;
             }
 
@@ -279,7 +281,8 @@ $(function(){
     }
 
     // Main draw function
-    function draw() {
+    function draw(ignoreCenterText) {
+        var ignoreCenterText = ignoreCenterText || false;
 
         // - BACKGROUND -
         clearCanvas();
@@ -294,7 +297,7 @@ $(function(){
         ctx.textBaseline = "middle";
 //        ctx.fillText("Score:", CANVAS_WIDTH - 170 , 40);
         ctx.font = "24pt Helvetica";
-        ctx.fillText("Health", 440 , 30);
+//        ctx.fillText("Health", 440 , 30);
         drawHP(392, 53, 32, 38, 7);
 
         // Level Display
@@ -305,12 +308,14 @@ $(function(){
 
         ctx.font = "26pt Helvetica";
         ctx.textAlign = "center";
-        ctx.fillText(score, 666 , 78);
-        ctx.fillText(level, 777 , 78);
-        ctx.fillText(Math.ceil(remainingTime), 910 , 78);
+        ctx.fillStyle = "#49a3fd";
+        ctx.fillText(highscore, 666 , 80);
+        ctx.fillText(score, 781 , 80);
+        ctx.fillText(Math.ceil(remainingTime), 910 , 80);
 
         //Draw pause instructions
         ctx.font = "10pt Helvetica";
+        ctx.fillStyle = "white";
         ctx.fillText("P: Pause/Resume", CANVAS_WIDTH - 100, CANVAS_HEIGHT - 30);
 
 
@@ -319,23 +324,21 @@ $(function(){
             plunger.draw();
         });
 
-        // end game if no more HP
-        if(HP <= 0)
-            end();
-
-        // pause game if paused
-        if(paused){
-            window.clearInterval(gameLoop);
-            var lastDisplayText = displayText;
-            displayText = "PAUSED";
-            centerText();
-        } else if(gameOver){ // End game if ended
-            window.clearInterval(gameLoop);
-            displayText = "GAME OVER";
-            centerText();
-            centerSubText("Press spacebar to play again.");
-        } else if(showCenterText){
-            centerText();
+        if(!ignoreCenterText){
+            // pause game if paused
+            if(paused){
+                window.clearInterval(gameLoop);
+                var lastDisplayText = displayText;
+                displayText = "PAUSED";
+                centerText();
+            } else if(gameOver){ // End game if ended
+                window.clearInterval(gameLoop);
+                displayText = "GAME OVER";
+                centerText();
+                centerSubText("Press spacebar to play again.");
+            } else if(showCenterText){
+                centerText();
+            }
         }
 
 
@@ -345,6 +348,11 @@ $(function(){
     function update() {
         counter++;
         remainingTime -= 1/FPS;
+
+
+        // end game if no more HP
+        if(HP <= 0)
+            end();
 
         if(remainingTime <= 0){
             remainingTime += TIME_PER_LEVEL;
@@ -378,7 +386,7 @@ $(function(){
 
     // detection for whether the item fell straight into the toilet
     function collides(t, item) {
-        var fallThreshold = 35; // height of the hitbox of the item falling into toilet
+        var fallThreshold = 50; // height of the hitbox of the item falling into toilet
         return t.x + t.hole().x1 < item.x &&
             t.x + t.hole().x2 > item.x + item.width &&
             t.y + t.hole().y < item.y + item.height &&
@@ -450,6 +458,8 @@ $(function(){
     // Game end
     function end(){
         gameOver = true;
+        gameGoing = false;
+        highscore = score;
         Sound.stopAll();
         Sound.play("gameover");
     }
@@ -512,7 +522,7 @@ $(function(){
     // Displays a new level indication
     function newLevel(){
         showCenterText = true;
-        displayText = "LEVEL "+ level;
+        displayText = "NEW LEVEL";
         setTimeout(function(){ //stop display of new level after 1.5 seconds
             showCenterText = false;
         }, 2000);
