@@ -9,15 +9,17 @@ var Sound = function(){
         loadedCallback = loadedCallback || function(){};
         var sound = $('<audio />').get(0);
         sound.preload = "auto";
-        sound.src = src;
-        sound.addEventListener("canplaythrough", function(){
+        sound.oncanplaythrough = function(){
             Sound.loadedCount ++;
+            console.log("Loaded "+src);
             loadedCallback();
             if(Sound.loadedCount == Object.keys(Sound.sounds).length){
                 $(Sound).trigger("loaded");
-                console.log("FINISHED LOADING");
+                console.log("FINISHED LOADING SOUNDS");
             }
-        });
+        };
+        sound.src = src;
+
         Sound.sounds[id] = sound;
     }
 
@@ -87,8 +89,8 @@ var Sound = function(){
 
     this.stopAll = function(){
         for(var name in Sound.nowPlaying){
-            console.log(Sound.nowPlaying);
-            console.log(Sound.nowPlaying[name]);
+//            console.log(Sound.nowPlaying);
+//            console.log(Sound.nowPlaying[name]);
             Sound.nowPlaying[name].pause();
         }
         Sound.nowPlaying = {};
