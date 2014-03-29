@@ -110,30 +110,31 @@ $(function(){
 
     // ====== Toilet object constructor =======
     function Toilet(){
-        this.width= 238;
-        this.height= 249;
+        this.width= 237;
+        this.height= 290;
         this.x = 150;
         this.y = CANVAS_HEIGHT - this.height;
         this.velX = 0;
         this.friction = 0.94;
-        this.spriteL = Sprite("toiletLNew", 0, 0, 238, 249);
-        this.spriteR = Sprite("toiletRNew", 0, 0, 238, 249);
-        this.frontSpace = 15;
+        this.spriteL = Sprite("toiletLBig", 0, 0, 237, 290);
+        this.spriteR = Sprite("toiletRBig", 0, 0, 237, 290);
+        this.frontSpace = 0;
+        this.turnCompensation = 82; // amount of horizontal space to adjust to keep hole unmoved after turning direction
         this.direction = 1; // -1 is for left, 1 is for right;
         this.bounce = 0.5;
 
         this.hole = function(){
             if(this.direction == 1){ //return hole location for right-facing toilet
                 return {
-                    x1 : 84,
-                    x2 : 182,
-                    y : 131
+                    x1 : 102,
+                    x2 : this.width - 20,
+                    y : 159
                 };
             } else { // return hole location for left-facing toilet
                 return {
-                    x1 : 56,
-                    x2 : 187,
-                    y : 131
+                    x1 : 20,
+                    x2 : this.width - 102,
+                    y : 159
                 };
             }
         }
@@ -162,10 +163,17 @@ $(function(){
                 this.velX *= -this.bounce;
             }
 
+            var lastDirection = this.direction;
+
             if(this.velX > 0){
                 this.direction = 1;
             } else {
                 this.direction = -1;
+            }
+
+            // Adjust horizontally so hole is unmoved
+            if(lastDirection != this.direction){
+                this.x -= this.direction * this.turnCompensation;
             }
         }
 
@@ -197,7 +205,7 @@ $(function(){
 
         I.width = 40;
         I.height = 100;
-        I.sprite = Sprite("plungerNew", 0, 0, 100, 253);
+        I.sprite = Sprite("plunger", 0, 0, 100, 253);
 
         I.x = 100 + Math.random() * (CANVAS_WIDTH - 200);
         I.y = 0;
