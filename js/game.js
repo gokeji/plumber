@@ -53,7 +53,7 @@ $(function(){
     Sound = new Sound();
 
     $(Sound).bind("loaded", function(){
-        clearCanvas();
+//        clearCanvas();
         draw(true);
         ctx.save();
         ctx.font = "50px Helvetica";
@@ -108,7 +108,7 @@ $(function(){
     //gameOver = false;
 
 
-    plungers.push(plunger()); // Add a plunger right away to start off the game with
+//    plungers.push(plunger()); // Add a plunger right away to start off the game with
 
     // ====== Toilet object constructor =======
     function Toilet(){
@@ -167,7 +167,7 @@ $(function(){
 
             var lastDirection = this.direction;
 
-            if(this.velX > 0){
+            if(this.velX >= 0){
                 this.direction = 1;
             } else {
                 this.direction = -1;
@@ -182,14 +182,14 @@ $(function(){
         this.draw = function(){
 //                    ctx.fillStyle = "blue";
 //                    ctx.fillRect(this.x, this.y, this.width, this.height);
-            if(this.velX > 0){
+            if(this.velX >= 0){
                 this.spriteR.draw(ctx, this.x, this.y, this.width, this.height);
             } else {
                 this.spriteL.draw(ctx, this.x, this.y, this.width, this.height);
             }
 
 
-            ctx.font = "12pt Helvetica";
+//            ctx.font = "12pt Helvetica";
     //        ctx.fillText("direction: "+this.direction, CANVAS_WIDTH - 400 , 150);
     //        ctx.fillText("plunger y: "+this.y, CANVAS_WIDTH - 150 , 150);
 
@@ -281,14 +281,15 @@ $(function(){
     }
 
     // Main draw function
-    function draw(ignoreCenterText) {
-        var ignoreCenterText = ignoreCenterText || false;
+    function draw(initial) {
+        var initial = initial || false;
 
+        ctx.save();
         // - BACKGROUND -
         clearCanvas();
 
         // - FOREGROUND -
-        t.draw();
+        if(!initial) t.draw();
 
 
         // - OVERLAY -
@@ -324,7 +325,7 @@ $(function(){
             plunger.draw();
         });
 
-        if(!ignoreCenterText){
+        if(!initial){
             // pause game if paused
             if(paused){
                 window.clearInterval(gameLoop);
@@ -341,7 +342,7 @@ $(function(){
             }
         }
 
-
+        ctx.restore();
     }
 
     // Main update function
@@ -490,7 +491,8 @@ $(function(){
 
         var countDown = function(){
             if(cd > 0 && initialLoad){
-                clearCanvas();
+//                clearCanvas();
+                draw(true);
                 ctx.fillText(cd, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2);
                 cd--;
                 Sound.play("click");
