@@ -36,33 +36,51 @@ $(function(){
     var soundURL = "sounds/";
     var soundsToLoad = ["applauseFlush.mp3", "bg.wav", "click.mp3", "coin.mp3", "down.mp3", "gameover.mp3", "pause.mp3", "up.mp3"];
 
-    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+//    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Setup Screen
+    var soundsLoaded = false;
+    var imagesLoaded = false;
 
-    ctx.fillStyle = "#ddd";
-    clearCanvas();
-    ctx.save();
-    ctx.font = "50px Helvetica";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-    ctx.restore();
-
-    // preload sounds
-    Sound = new Sound();
-
-    $(Sound).bind("loaded", function(){
-//        clearCanvas();
+    function loadingScreen(){
         draw(true);
         ctx.save();
+        ctx.fillStyle = "white";
+        ctx.font = "50px Helvetica";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+        ctx.restore();
+    }
+
+    function loadedScreen(){
+        draw(true);
+        ctx.save();
+        ctx.fillStyle = "white";
         ctx.font = "50px Helvetica";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("Loaded", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
         ctx.font = "30px Helvetica";
-        ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 70);
+        ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 60);
         ctx.restore();
+    }
+
+    // Setup Screen
+    var bg = Sprite("bg", function(){  // loading background
+        imagesLoaded = true;
+        if(soundsLoaded){
+            loadedScreen();
+        } else {
+            loadingScreen();
+        }
+    });
+
+    // preload sounds
+    Sound = new Sound();
+
+    $(Sound).bind("loaded", function(){
+        soundsLoaded = true;
+        loadedScreen();
     })
 
     for (var i = 0; i < soundsToLoad.length; i++){
@@ -442,7 +460,7 @@ $(function(){
     // Draw text at center of screen
     function centerText(){
         ctx.save();
-        ctx.font = "30pt Helvetica";
+        ctx.font = "35pt Helvetica";
         ctx.textAlign = "center";
         ctx.fillText(displayText, CANVAS_WIDTH/2 , CANVAS_HEIGHT/3);
         ctx.restore();
@@ -486,6 +504,7 @@ $(function(){
         var cd = 3;
 
         ctx.save();
+        ctx.fillStyle = "white";
         ctx.font = "150px Helvetica";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
