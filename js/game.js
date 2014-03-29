@@ -34,7 +34,7 @@ $(function(){
     var initialLoad = true;
 
     var soundURL = "sounds/";
-    var soundsToLoad = ["applauseFlush.mp3", "bg.wav", "click.mp3", "coin.mp3", "down.mp3", "gameover.mp3", "pause.mp3", "up.mp3"];
+    var soundsToLoad = ["applauseFlush.mp3", "bg.mp3", "click.mp3", "coin.mp3", "down.mp3", "gameover.mp3", "pause.mp3", "up.mp3"];
 
 //    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
