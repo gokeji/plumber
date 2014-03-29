@@ -36,7 +36,7 @@ $(function(){
     var initialLoad = true;
 
     var soundURL = "sounds/";
-    var soundsToLoad = ["applauseFlush.mp3", "bg.mp3", "click.mp3", "coin.mp3", "down.mp3", "gameover.mp3", "pause.mp3", "up.mp3"];
+    var soundsToLoad = ["applauseFlush.ogg", "bg.ogg", "click.ogg", "coin.ogg", "down.ogg", "gameover.ogg", "pause.ogg", "up.ogg"];
 
 //    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -80,9 +80,9 @@ $(function(){
     // preload sounds
 //    Sound = new Sound();
     Sounds = {};
-//    if(is_firefox){ // prefer HTMLAudio over WebAudio
-//        createjs.Sound.registerPlugins([createjs.HTMLAudioPlugin, createjs.WebAudioPlugin, createjs.FlashPlugin]);
-//    }
+    if(is_firefox){ // prefer HTMLAudio over WebAudio
+        createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
+    }
 
 //    $(Sound).bind("loaded", function(){
 //        soundsLoaded = true;
@@ -124,6 +124,7 @@ $(function(){
         };
 
         console.log("loading "+id);
+        createjs.Sound.alternateExtensions = ["mp3"];
         createjs.Sound.addEventListener("fileload", callback);
         createjs.Sound.registerSound(src, id);
     }
