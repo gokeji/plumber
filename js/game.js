@@ -26,7 +26,7 @@ $(function(){
     var maxHP = 5;
     var HP = maxHP;
     var level = 1;
-    var levelToSwirl = 9;
+    var levelToSwirl = 7;
     var remainingTime = TIME_PER_LEVEL;
     var gameOver = true;
 
@@ -349,7 +349,7 @@ $(function(){
                 if(!I.scored){
                     score++;
                     I.scored = true;
-                    createjs.Sound.play("coin", {volume:0.5});
+                    createjs.Sound.play("coin", {volume:0.3});
                 }
 
             } else if(!I.inBounds() && !I.scored) {
