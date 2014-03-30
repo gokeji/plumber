@@ -16,6 +16,7 @@ $(function(){
 
     var freq = [0.66, 1, 1.2, 1.3, 1.4, 1.5]; // Plungers per second for each level
     var fallSpeed = [4, 4, 5, 5, 6, 6, 7, 7]; // Plungers falling speed for each level
+    var swirlSpeed = [2, 3, 4, 5];
     var score = 0;
     if(getCookie("highscore") == ""){
         var highscore = 0;
@@ -25,6 +26,7 @@ $(function(){
     var maxHP = 5;
     var HP = maxHP;
     var level = 1;
+    var levelToSwirl = 9;
     var remainingTime = TIME_PER_LEVEL;
     var gameOver = true;
 
@@ -35,6 +37,7 @@ $(function(){
     var muted = false;
     var displayText = "";
     var lastDisplayText = "";
+    var lastPlungerXPos = 500;
     var showCenterText = false;
     var backgroundColor = "white";
     var paused = false;
@@ -275,9 +278,28 @@ $(function(){
         I.sprite = Sprite("plunger", 0, 0, 100, 253);
 
         I.x = 150 + Math.random() * (CANVAS_WIDTH - 300);
+        // Logic to make sure plunger spawn position is feasible
+//        if(t.xVelocity > 0) { // if toilet is moving right, spawn anywhere to its right but not too far the other way
+//            var xMin = Math.max(150, t.x - 500);
+//            var xMax = Math.min(CANVAS_WIDTH - 150);
+//            I.x = xMin + Math.random() * (xMax - xMin);
+//        } else {
+//            var xMin = Math.max(150);
+//            var xMax = Math.min(t.x + 500, CANVAS_WIDTH - 150);
+//            I.x = xMin + Math.random() * (xMax - xMin);
+//        }
+        if(Math.abs(I.x - lastPlungerXPos) > 600) {
+            I.x -= (I.x - lastPlungerXPos) * 0.9;
+        }
+        lastPlungerXPos = I.x;
         I.y = 0;
         I.xVelocity = 0;
         I.yVelocity = getVal(fallSpeed, level-1);
+        I.swirl = false;
+        if(level >= levelToSwirl) {
+            I.swirl = true;
+        }
+        I.randomPhase = Math.random() * Math.PI;
 
         I.inBounds = function() {
             return I.x >= 0 && I.x <= CANVAS_WIDTH &&
@@ -295,13 +317,6 @@ $(function(){
                 I.sprite.draw(ctx, this.x, this.y, this.width, this.height);
     //            ctx.fillRect(this.x, this.y, this.width, this.height);
             }
-
-    //        ctx.fillRect(this.x, this.y, this.width, this.height);
-    //        ctx.font = "12pt Helvetica";
-    //        ctx.fillText("plunger x: "+this.x, CANVAS_WIDTH - 400 , 150);
-    //        ctx.fillText("plunger y: "+this.y, CANVAS_WIDTH - 150 , 150);
-    //        ctx.fillText("plunger x: "+this.width, CANVAS_WIDTH - 400 , 250);
-    //        ctx.fillText("plunger y: "+this.height, CANVAS_WIDTH - 150 , 250);
         };
 
         I.update = function() {
@@ -315,12 +330,14 @@ $(function(){
                     I.xVelocity *= -0.9;
                 }
             }
-//            I.x += I.xVelocity;
             I.y += I.yVelocity;
 
-                // For swirling
-//                I.xVelocity = 3 * Math.sin(I.age * Math.PI / 64);
-//                I.age++;
+            // For swirling
+            if(I.swirl) {
+                I.xVelocity = getVal(swirlSpeed, level - levelToSwirl) * Math.sin(I.age * ((Math.PI + I.randomPhase) / 64));
+                I.x += I.xVelocity;
+            }
+            I.age++;
 
             // For vertical acceleration
             I.yVelocity += I.age * PLUNGER_ACCELERATION;
@@ -623,6 +640,9 @@ $(function(){
     function newLevel(){
         showCenterText = true;
         displayText = "NEW LEVEL";
+        if(level == levelToSwirl) {
+            displayText = "You didn't see this coming";
+        }
         setTimeout(function(){ //stop display of new level after 1.5 seconds
             showCenterText = false;
         }, 2000);
