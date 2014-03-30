@@ -554,8 +554,10 @@ $(function(){
     function end(){
         gameOver = true;
         gameGoing = false;
-        highscore = score;
-        setCookie('highscore', highscore, 365);
+        if(score > highscore) {
+            highscore = score;
+            setCookie('highscore', highscore, 365);
+        }
         createjs.Sound.stop();
         createjs.Sound.play("gameover");
     }
