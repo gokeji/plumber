@@ -47,6 +47,7 @@ $(function(){
 
     var soundURL = "sounds/";
     var soundsToLoad = ["bg.ogg", "applauseFlush.ogg","click.ogg", "coin.ogg", "down.ogg", "gameover.ogg", "pause.ogg", "up.ogg"];
+    var soundsLoaded = {};
 
 //    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -63,11 +64,14 @@ $(function(){
         ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
         ctx.restore();
 
-        setTimeout(function(){ // If game doesn't load in 3 seconds, start game
-           if(gameover && !soundsLoaded) {
-               start();
-           }
-        }, 3000);
+        if($('#IE').length > 0 ){
+            console.log("this is IE");
+        }
+//        setTimeout(function(){ // If game doesn't load in 3 seconds, start game
+//           if(gameover && !soundsLoaded) {
+//               start();
+//           }
+//        }, 3000);
     }
 
     function loadedScreen(){
@@ -100,18 +104,6 @@ $(function(){
     // preload sounds
 //    Sound = new Sound();
     Sounds = {};
-//    if(is_firefox){ // prefer HTMLAudio over WebAudio
-//        createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
-//    }
-
-//    $(Sound).bind("loaded", function(){
-//        soundsLoaded = true;
-//        if(soundsLoaded){
-//            loadedScreen();
-//        } else {
-//            loadingScreen();
-//        }
-//    })
 
     for (var i = 0; i < soundsToLoad.length; i++){
         var src = soundsToLoad[i];
@@ -133,7 +125,7 @@ $(function(){
             var instance = createjs.Sound.createInstance(id);
             Sounds[id] = instance;
 //            console.log(instance);
-            if(id=="bg"){ // consider game loaded
+            if(Object.keys(Sounds).length == soundsToLoad.length){ // consider game loaded
                 soundsLoaded = true;
                 if(imagesLoaded){
                     loadedScreen();
@@ -395,7 +387,7 @@ $(function(){
         ctx.textAlign = "center";
         ctx.fillStyle = "#49a3fd";
         ctx.fillText(numToDigits(highscore), 666 , 80);
-        ctx.fillText(numToDigits(score), 781 , 80);
+        ctx.fillText(numToDigits(score), 792 , 80);
         ctx.fillText(numToDigits(Math.ceil(remainingTime)), 910 , 80);
 
         //Draw pause and mute instructions
