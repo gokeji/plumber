@@ -69,10 +69,10 @@ $(function(){
             console.log("this is IE");
         }
         setTimeout(function(){ // If game doesn't load in 3 seconds, start game
-           if((getInternetExplorerVersion > 0) && gameover && (!soundsLoaded || !imagesLoaded)) {
+           if((getInternetExplorerVersion() > 0) && gameover && (!soundsLoaded || !imagesLoaded)) {
                start();
            }
-        }, 10000);
+        }, 1000);
     }
 
     function loadedScreen(){
