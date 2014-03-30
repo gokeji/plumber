@@ -45,7 +45,7 @@ $(function(){
     var initialLoad = true;
     var currentCD = 5;
 
-    var soundURL = "sounds/";
+//    var soundURL = "sounds/";
     var soundsToLoad = ["bg.ogg", "applauseFlush.ogg","click.ogg", "coin.ogg", "down.ogg", "gameover.ogg", "pause.ogg", "up.ogg"];
     var soundsLoaded = {};
 
@@ -139,7 +139,7 @@ $(function(){
         console.log("loading "+id);
         createjs.Sound.alternateExtensions = ["mp3"];
         createjs.Sound.addEventListener("fileload", callback);
-        createjs.Sound.registerSound(src, id, 3, true, soundURL);
+        createjs.Sound.registerSound(src, id);
     }
 
     $(window).blur(function(){
@@ -447,8 +447,10 @@ $(function(){
             level++;
             createjs.Sound.play("applauseFlush");
             newLevel();
+            if(HP < maxHP) {
+                createjs.Sound.play("up.mp3");
+            }
             HP = maxHP;
-            createjs.Sound.play("up.mp3");
         }
 
         // ========== Toilet movement ==========
