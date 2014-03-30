@@ -55,9 +55,9 @@ $(function(){
     var imagesLoaded = false;
 
     function loadingScreen(){
-        draw(true);
+        draw(true, true);
         ctx.save();
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "#ddd";
         ctx.font = "50px Helvetica";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -355,8 +355,9 @@ $(function(){
     }
 
     // Main draw function
-    function draw(initial) {
+    function draw(initial, loading) {
         initial = initial || false;
+        loading = loading || false;
 
         ctx.save();
         // - BACKGROUND -
@@ -367,51 +368,49 @@ $(function(){
             t.draw();
         }
 
+        if(!loading){
+            // - OVERLAY -
+            ctx.fillStyle = "white";
+            ctx.font = "20pt Helvetica";
+            ctx.textBaseline = "middle";
+    //        ctx.fillText("Score:", CANVAS_WIDTH - 170 , 40);
+            ctx.font = "24pt Helvetica";
+    //        ctx.fillText("Health", 440 , 30);
+            drawHP(392, 53, 32, 38, 7);
 
-        // - OVERLAY -
-        ctx.fillStyle = "white";
-        ctx.font = "20pt Helvetica";
-        ctx.textBaseline = "middle";
-//        ctx.fillText("Score:", CANVAS_WIDTH - 170 , 40);
-        ctx.font = "24pt Helvetica";
-//        ctx.fillText("Health", 440 , 30);
-        drawHP(392, 53, 32, 38, 7);
+            // Level Display
+    //        ctx.fillText("Level:", CANVAS_WIDTH - 170 , 90);
 
-        // Level Display
-//        ctx.fillText("Level:", CANVAS_WIDTH - 170 , 90);
+            // Time left for this level
+    //        ctx.fillText("Next Level:", CANVAS_WIDTH - 170 , 140);
 
-        // Time left for this level
-//        ctx.fillText("Next Level:", CANVAS_WIDTH - 170 , 140);
+            ctx.font = "26pt Helvetica";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#49a3fd";
+            ctx.fillText(numToDigits(highscore), 666 , 80);
+            ctx.fillText(numToDigits(score), 792 , 80);
+            ctx.fillText(numToDigits(Math.ceil(remainingTime)), 910 , 80);
 
-        ctx.font = "26pt Helvetica";
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#49a3fd";
-        ctx.fillText(numToDigits(highscore), 666 , 80);
-        ctx.fillText(numToDigits(score), 792 , 80);
-        ctx.fillText(numToDigits(Math.ceil(remainingTime)), 910 , 80);
+            //Draw pause and mute instructions
+            ctx.font = "10pt Helvetica";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "left";
+            ctx.fillText("P: Pause / Resume", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 25);
+            ctx.fillText("M: Mute / Unmute", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 45);
+            if(muted){
+                mutedIcon.draw(ctx, 935, 120, 50, 50);
+            } else {
+                unmutedIcon.draw(ctx, 935, 120, 50, 50);
+            }
 
-        //Draw pause and mute instructions
-        ctx.font = "10pt Helvetica";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "left";
-        ctx.fillText("P: Pause / Resume", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 25);
-        ctx.fillText("M: Mute / Unmute", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 45);
-        if(muted){
-            mutedIcon.draw(ctx, 935, 120, 50, 50);
-        } else {
-            unmutedIcon.draw(ctx, 935, 120, 50, 50);
+
+            // - Plungers -
+            plungers.forEach(function(plunger) {
+                plunger.draw();
+            });
         }
 
-
-        // - Plungers -
-        plungers.forEach(function(plunger) {
-            plunger.draw();
-        });
-
         if(!initial){
-            if(muted){
-
-            }
             // pause game if paused
             if(paused){
                 window.clearInterval(gameLoop);
