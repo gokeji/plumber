@@ -63,6 +63,7 @@ $(function(){
         ctx.textBaseline = "middle";
         ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
         ctx.restore();
+        console.log('calling loading screen');
 
         if($('#IE').length > 0 ){
             console.log("this is IE");
