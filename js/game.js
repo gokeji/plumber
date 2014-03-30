@@ -68,16 +68,16 @@ $(function(){
         if($('#IE').length > 0 ){
             console.log("this is IE");
         }
-        setTimeout(function(){ // If game doesn't load in 3 seconds, start game
+        setTimeout(function(){ // If browser is IE and game doesn't load in 8 seconds, start game
            if((getInternetExplorerVersion() > 0) && gameover && (!soundsLoaded || !imagesLoaded)) {
                start();
            }
-        }, 1000);
+        }, 8000);
     }
 
     function loadedScreen(){
         if(gameOver){
-//            start();
+            start();
 //            draw(true);
 //            ctx.save();
 //            ctx.fillStyle = "white";
