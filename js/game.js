@@ -17,7 +17,11 @@ $(function(){
     var freq = [0.66, 1, 1.2, 1.3, 1.4, 1.5]; // Plungers per second for each level
     var fallSpeed = [4, 4, 5, 5, 6, 6, 7, 7]; // Plungers falling speed for each level
     var score = 0;
-    var highscore = 0;
+    if(getCookie("highscore") == ""){
+        var highscore = 0;
+    } else {
+        var highscore = getCookie("highscore");
+    }
     var maxHP = 5;
     var HP = maxHP;
     var level = 1;
@@ -109,7 +113,7 @@ $(function(){
     for (var i = 0; i < soundsToLoad.length; i++){
         var src = soundsToLoad[i];
         var id = src.split(".", 1);
-        src = soundURL + soundsToLoad[i];
+        src = soundsToLoad[i];
 
 //        function construct(id){
 //            return function(event){
@@ -139,7 +143,7 @@ $(function(){
         console.log("loading "+id);
         createjs.Sound.alternateExtensions = ["mp3"];
         createjs.Sound.addEventListener("fileload", callback);
-        createjs.Sound.registerSound(src, id);
+        createjs.Sound.registerSound(src, id, 3, true, soundURL);
     }
 
     $(window).blur(function(){
@@ -373,9 +377,9 @@ $(function(){
         ctx.font = "26pt Helvetica";
         ctx.textAlign = "center";
         ctx.fillStyle = "#49a3fd";
-        ctx.fillText(highscore, 666 , 80);
-        ctx.fillText(score, 781 , 80);
-        ctx.fillText(Math.ceil(remainingTime), 910 , 80);
+        ctx.fillText(numToDigits(highscore), 666 , 80);
+        ctx.fillText(numToDigits(score), 781 , 80);
+        ctx.fillText(numToDigits(Math.ceil(remainingTime)), 910 , 80);
 
         //Draw pause and mute instructions
         ctx.font = "10pt Helvetica";
@@ -540,6 +544,7 @@ $(function(){
         gameOver = true;
         gameGoing = false;
         highscore = score;
+        setCookie('highscore', highscore, 365);
         createjs.Sound.stop();
         createjs.Sound.play("gameover");
     }
