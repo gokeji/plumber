@@ -5,4 +5,4 @@ var TIME_PER_LEVEL = 15; // 30 seconds
 var TOILET_ACCELERATION = 1.45;
 var PLUNGER_ACCELERATION = 1/350;
 var SPRITE_IMAGE_PATH = "images";
-var SOUND_FILE_PATH = "/audio";
+var SOUND_FILE_PATH = "audio";
