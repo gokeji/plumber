@@ -18,7 +18,6 @@ $(function() {
 
     return {
       draw: function(canvas, x, y, displayW, displayH) {
-//          console.log(x, y, displayW, displayH);
         displayW = displayW || width;
         displayH = displayH || height;
         canvas.drawImage(
@@ -65,10 +64,8 @@ $(function() {
     return proxy;
   };
 
-  var spriteImagePath = "images/";
-
   window.Sprite = function(name, callback) {
-    return Sprite.load(spriteImagePath + name + ".png", callback);
+    return Sprite.load(SPRITE_IMAGE_PATH + "/" + name + ".png", callback);
   };
   window.Sprite.EMPTY = LoaderProxy();
   window.Sprite.load = Sprite.load;

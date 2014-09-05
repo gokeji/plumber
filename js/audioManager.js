@@ -1,4 +1,5 @@
 var Sound = function(){
+
     this.sounds = {};
     this.muted = false;
     this.nowPlaying = {};
@@ -11,13 +12,9 @@ var Sound = function(){
         sound.preload = "auto";
         sound.oncanplaythrough = function(){
             Sound.loadedCount ++;
-            console.log("Loaded "+src);
             loadedCallback();
-            console.log("loaded count = "+Sound.loadedCount);
-            console.log("Object keys length = "+ Object.keys(Sound.sounds).length);
             if(Sound.loadedCount == Object.keys(Sound.sounds).length){
                 $(Sound).trigger("loaded");
-                console.log("FINISHED LOADING SOUNDS");
             }
         };
         sound.src = src;
@@ -37,21 +34,14 @@ var Sound = function(){
                 Sound.nowPlaying[name] = sClone;
 
                 if(loop){
-//                    console.log(name + ' needs loop');
-//                    sClone.loop = true;
                     $(sClone).bind('ended', function(){
-                        // play again
-//                        console.log('restarting');
                         if (window.chrome) {
                             sClone.load();
                         }
                         sClone.play();
                     });
                 } else {
-//                    console.log(name + ' DONT need loop');
                     $(sClone).bind('ended', function(){
-                        // remove from nowPlaying
-//                        console.log('deleting sound '+name);
                         delete Sound.nowPlaying[name];
                     });
                 }
@@ -91,8 +81,6 @@ var Sound = function(){
 
     this.stopAll = function(){
         for(var name in Sound.nowPlaying){
-//            console.log(Sound.nowPlaying);
-//            console.log(Sound.nowPlaying[name]);
             Sound.nowPlaying[name].pause();
         }
         Sound.nowPlaying = {};

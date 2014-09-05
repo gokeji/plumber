@@ -1,12 +1,10 @@
 $(function(){
+
     // ====== Initializing game ======
-    var canvas = $("canvas")[0],
-        ctx = canvas.getContext("2d");
-
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
-
-    var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    var onscreenCanvas = $("canvas")[0];
+    onscreenCanvas.width = CANVAS_WIDTH;
+    onscreenCanvas.height = CANVAS_HEIGHT;
+    var drawContext = onscreenCanvas.getContext("2d");
 
     var FPS = 50;
     var counter = 0;
@@ -18,22 +16,20 @@ $(function(){
     var fallSpeed = [4, 4, 5, 5, 6, 6, 7, 7]; // Plungers falling speed for each level
     var swirlSpeed = [2, 3, 4, 5];
     var score = 0;
-    if(getCookie("highscore") == ""){
-        var highscore = 0;
-    } else {
-        var highscore = getCookie("highscore");
-    }
+    var highscore = parseInt(getCookie("highscore")) || 0;
+    
     var maxHP = 5;
     var HP = maxHP;
     var level = 1;
-    var levelToSwirl = 7;
+    var levelToSwirl = 5;
     var remainingTime = TIME_PER_LEVEL;
     var gameOver = true;
 
+    var helpText = Sprite("helpText", 0, 0, 169, 46); // help text (mute / pause)
+    var header = Sprite("header", 0, 0, 1000, 114); // header background
     var toiletGrey = Sprite("hp", 0, 0, 50, 59); // HP toilet icon
     var toiletRed = Sprite("hp2", 0, 0, 50, 59); // HP toilet icon
-    var mutedIcon = Sprite("muted", 0, 0, 128, 128);
-    var unmutedIcon = Sprite("unmuted", 0, 0, 128, 128);
+    var bg = Sprite("bg", 0, 0, 1000, 700); // Canvas background 
     var muted = false;
     var displayText = "";
     var lastDisplayText = "";
@@ -45,113 +41,63 @@ $(function(){
     var initialLoad = true;
     var currentCD = 5;
 
-//    var soundURL = "sounds/";
+    // var soundURL = "sounds/";
+    var imagesToLoad = ["hp", "hp2", "bg", "header", "helpText", "toiletLBig", "toiletRBig", "plunger"];
     var soundsToLoad = ["bg.ogg", "applauseFlush.ogg","click.ogg", "coin.ogg", "down.ogg", "gameover.ogg", "pause.ogg", "up.ogg"];
     var soundsLoaded = {};
-
-//    var bg = Sprite("bg", 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
     var soundsLoaded = false;
     var imagesLoaded = false;
 
+    var imagesLeftToLoad = imagesToLoad.length;
+    for (var i = 0; i < imagesToLoad.length; i++) {
+        (function(){
+            var imageLoader = new Image();
+            imageLoader.onload = function() {
+                imagesLeftToLoad--;
+                if (imagesLeftToLoad <= 0) {
+                    loadedScreen();
+                }
+            };
+            imageLoader.src = SPRITE_IMAGE_PATH + "/" + imagesToLoad[i] + ".png";
+        })();
+    }
+    loadingScreen();
+
     function loadingScreen(){
         draw(true, true);
-        ctx.save();
-        ctx.fillStyle = "#ddd";
-        ctx.font = "50px Helvetica";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-        ctx.restore();
-        console.log('calling loading screen');
-
-        if($('#IE').length > 0 ){
-            console.log("this is IE");
-        }
-        setTimeout(function(){ // If browser is IE and game doesn't load in 8 seconds, start game
-           if((getInternetExplorerVersion() > 0) && gameover && (!soundsLoaded || !imagesLoaded)) {
-               start();
-           }
-        }, 8000);
+        drawContext.save();
+        drawContext.fillStyle = "#ddd";
+        drawContext.font = "bold 50px 'Helvetica Neue', Helvetica";
+        drawContext.textAlign = "center";
+        drawContext.textBaseline = "middle";
+        drawContext.fillText("Loading...", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+        drawContext.restore();
     }
 
     function loadedScreen(){
         if(gameOver){
             start();
-//            draw(true);
-//            ctx.save();
-//            ctx.fillStyle = "white";
-//            ctx.font = "50px Helvetica";
-//            ctx.textAlign = "center";
-//            ctx.textBaseline = "middle";
-//            ctx.fillText("Loaded", CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-//            ctx.font = "30px Helvetica";
-//            ctx.fillText("Press Spacebar to Start.", CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 60);
-//            ctx.restore();
-            console.log("loaded screen display");
         }
     }
 
-    // Setup Screen
-    var bg = Sprite("bg", function(){  // loading background
-        imagesLoaded = true;
-        if(soundsLoaded){
-            loadedScreen();
-        } else {
-            loadingScreen();
-        }
-    });
-
     // preload sounds
-//    Sound = new Sound();
     Sounds = {};
-
     for (var i = 0; i < soundsToLoad.length; i++){
         var src = soundsToLoad[i];
-        var id = src.split(".", 1);
-        src = soundsToLoad[i];
-
-//        function construct(id){
-//            return function(event){
-//                var id =
-//                console.log("loaded "+ event.id[0]);
-//                console.log(event);
-//            };
-//        }
-
+        var id = soundsToLoad[i].split(".", 1);        
         var callback = function(event){
             var id = event.id[0];
-//            console.log("loaded "+ id);
-//            console.log(event);
             var instance = createjs.Sound.createInstance(id);
             Sounds[id] = instance;
-//            console.log(instance);
-            if(Object.keys(Sounds).length == soundsToLoad.length){ // consider game loaded
-                soundsLoaded = true;
-                if(imagesLoaded){
-                    loadedScreen();
-                } else {
-                    loadingScreen();
-                }
-            }
         };
-
-        console.log("loading "+id);
         createjs.Sound.alternateExtensions = ["mp3"];
         createjs.Sound.addEventListener("fileload", callback);
-        createjs.Sound.registerSound(src, id);
+        createjs.Sound.registerSound(src, id, null, true, SOUND_FILE_PATH + "/");
     }
 
     $(window).blur(function(){
         pause();
-//        console.log("window blurred");
     });
-    $(window).focus(function(){
-//        resume();
-//        console.log("window focused");
-    });
-    // TODO Add game loading bar
-
 
     // ====== Setting Game Loop ======
     var gameLoop = null;
@@ -162,13 +108,6 @@ $(function(){
             draw();
         }, 1000/FPS);
     }
-
-    //var gameLoop = startLoop();
-    //gameGoing = true;
-    //gameOver = false;
-
-
-//    plungers.push(plunger()); // Add a plunger right away to start off the game with
 
     // ====== Toilet object constructor =======
     function Toilet(){
@@ -241,19 +180,11 @@ $(function(){
         }
 
         this.draw = function(){
-//                    ctx.fillStyle = "blue";
-//                    ctx.fillRect(this.x, this.y, this.width, this.height);
             if(this.velX >= 0){
-                this.spriteR.draw(ctx, this.x, this.y, this.width, this.height);
+                this.spriteR.draw(drawContext, this.x, this.y, this.width, this.height);
             } else {
-                this.spriteL.draw(ctx, this.x, this.y, this.width, this.height);
+                this.spriteL.draw(drawContext, this.x, this.y, this.width, this.height);
             }
-
-
-//            ctx.font = "12pt Helvetica";
-    //        ctx.fillText("direction: "+this.direction, CANVAS_WIDTH - 400 , 150);
-    //        ctx.fillText("plunger y: "+this.y, CANVAS_WIDTH - 150 , 150);
-
         }
     }
 
@@ -263,24 +194,13 @@ $(function(){
 
         I.alive = true;
         I.scored = false;
-//        I.age = Math.floor(Math.random() * 128);
         I.age = 0;
-
         I.width = 40;
         I.height = 100;
         I.sprite = Sprite("plunger", 0, 0, 100, 253);
 
         I.x = 150 + Math.random() * (CANVAS_WIDTH - 300);
-        // Logic to make sure plunger spawn position is feasible
-//        if(t.xVelocity > 0) { // if toilet is moving right, spawn anywhere to its right but not too far the other way
-//            var xMin = Math.max(150, t.x - 500);
-//            var xMax = Math.min(CANVAS_WIDTH - 150);
-//            I.x = xMin + Math.random() * (xMax - xMin);
-//        } else {
-//            var xMin = Math.max(150);
-//            var xMax = Math.min(t.x + 500, CANVAS_WIDTH - 150);
-//            I.x = xMin + Math.random() * (xMax - xMin);
-//        }
+
         if(Math.abs(I.x - lastPlungerXPos) > 600) {
             I.x -= (I.x - lastPlungerXPos) * 0.9;
         }
@@ -300,15 +220,13 @@ $(function(){
         };
 
         I.draw = function() {
-            ctx.fillStyle = "white";
+            drawContext.fillStyle = "white";
             if(I.scored){
                 if(this.y <= t.y + t.hole().y){
-                    I.sprite.draw(ctx, this.x, this.y, this.width, t.y + t.hole().y - this.y);
-    //                ctx.fillRect(this.x, this.y, this.width, this.width, t.y + t.hole().y - this.y);
+                    I.sprite.draw(drawContext, this.x, this.y, this.width, t.y + t.hole().y - this.y);
                 }
             } else {
-                I.sprite.draw(ctx, this.x, this.y, this.width, this.height);
-    //            ctx.fillRect(this.x, this.y, this.width, this.height);
+                I.sprite.draw(drawContext, this.x, this.y, this.width, this.height);
             }
         };
 
@@ -342,12 +260,12 @@ $(function(){
                 if(!I.scored){
                     score++;
                     I.scored = true;
-                    createjs.Sound.play("coin", {volume:0.3});
+                    createjs.Sound.play("coin", { volume: 0.1 });
                 }
 
             } else if(!I.inBounds() && !I.scored) {
                 HP--;
-                createjs.Sound.play("down");
+                createjs.Sound.play("down", { volume: 0.1 });
             }
 
         };
@@ -360,9 +278,11 @@ $(function(){
         initial = initial || false;
         loading = loading || false;
 
-        ctx.save();
+        drawContext.save();
         // - BACKGROUND -
         clearCanvas();
+
+        helpText.draw(drawContext, 796, 635);
 
         // - FOREGROUND -
         if(!initial) {
@@ -370,41 +290,22 @@ $(function(){
         }
 
         if(!loading){
+
             // - OVERLAY -
-            ctx.fillStyle = "white";
-            ctx.font = "20pt Helvetica";
-            ctx.textBaseline = "middle";
-    //        ctx.fillText("Score:", CANVAS_WIDTH - 170 , 40);
-            ctx.font = "24pt Helvetica";
-    //        ctx.fillText("Health", 440 , 30);
-            drawHP(392, 53, 32, 38, 7);
+            drawContext.fillStyle = "white";
+            drawContext.font = "bold 20pt 'Helvetica Neue', Helvetica";
+            drawContext.textBaseline = "middle";
+            drawContext.font = "bold 24pt 'Helvetica Neue', Helvetica";
+            drawHP(372, 55, 32, 38, 7);
 
-            // Level Display
-    //        ctx.fillText("Level:", CANVAS_WIDTH - 170 , 90);
-
-            // Time left for this level
-    //        ctx.fillText("Next Level:", CANVAS_WIDTH - 170 , 140);
-
-            ctx.font = "26pt Helvetica";
-            ctx.textAlign = "center";
-            ctx.fillStyle = "#49a3fd";
-            ctx.fillText(numToDigits(highscore), 666 , 80);
-            ctx.fillText(numToDigits(score), 792 , 80);
-            ctx.fillText(numToDigits(Math.ceil(remainingTime)), 910 , 80);
-
-            //Draw pause and mute instructions
-            ctx.font = "10pt Helvetica";
-            ctx.fillStyle = "white";
-            ctx.textAlign = "left";
-            ctx.fillText("P: Pause / Resume", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 25);
-            ctx.fillText("M: Mute / Unmute", CANVAS_WIDTH - 140, CANVAS_HEIGHT - 45);
-            if(muted){
-                mutedIcon.draw(ctx, 935, 120, 50, 50);
-            } else {
-                unmutedIcon.draw(ctx, 935, 120, 50, 50);
-            }
-
-
+            drawContext.font = "bold 26pt 'Helvetica Neue', Helvetica";
+            drawContext.textAlign = "center";
+            drawContext.fillStyle = "#49a3fd";
+            drawContext.fillText(numToDigits(highscore), 666 , 80);
+            drawContext.fillText(numToDigits(score), 782 , 80);
+            drawContext.fillText(numToDigits(Math.ceil(remainingTime)), 910 , 80);
+            drawContext.fillStyle = "white";
+            
             // - Plungers -
             plungers.forEach(function(plunger) {
                 plunger.draw();
@@ -422,13 +323,13 @@ $(function(){
                 window.clearInterval(gameLoop);
                 displayText = "GAME OVER";
                 centerText();
-                centerSubText("Press spacebar to play again.");
+                centerSubText("Press spacebar to play again");
             } else if(showCenterText){
                 centerText();
             }
         }
 
-        ctx.restore();
+        drawContext.restore();
     }
 
     // Main update function
@@ -445,10 +346,10 @@ $(function(){
         if(remainingTime <= 0){
             remainingTime += TIME_PER_LEVEL;
             level++;
-            createjs.Sound.play("applauseFlush");
+            createjs.Sound.play("applauseFlush", { volume: 0.1 });
             newLevel();
             if(HP < maxHP) {
-                createjs.Sound.play("up.mp3");
+                createjs.Sound.play("up", { volume: 0.1 });
             }
             HP = maxHP;
         }
@@ -468,7 +369,6 @@ $(function(){
 
         // generate new plunger based on the value of freq
         if(counter >= FPS/getVal(freq, level-1) - 1){
-    //    if(plungers.length == 0){
             counter = 0;
             plungers.push(plunger());
         }
@@ -518,7 +418,7 @@ $(function(){
     function pause(){
         if(!gameOver && !paused && gameGoing) {
             paused = true;
-            createjs.Sound.play("pause");
+            createjs.Sound.play("pause", { volume: 0.1 });
         }
     }
 
@@ -534,20 +434,23 @@ $(function(){
 
     // Draw text at center of screen
     function centerText(){
-        ctx.save();
-        ctx.font = "35pt Helvetica";
-        ctx.textAlign = "center";
-        ctx.fillText(displayText, CANVAS_WIDTH/2 , CANVAS_HEIGHT/3);
-        ctx.restore();
+        drawContext.save();
+        drawContext.FOO
+        drawContext.font = "bold 92px 'Helvetica Neue', Helvetica";
+        drawContext.textAlign = "center";
+        drawContext.textBaseline = "middle";
+        drawContext.fillText(displayText, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2);
+        drawContext.restore();
     }
 
     // Draw subtext at center of screen
     function centerSubText(text){
-        ctx.save();
-        ctx.font = "20pt Helvetica";
-        ctx.textAlign = "center";
-        ctx.fillText(text, CANVAS_WIDTH/2 , CANVAS_HEIGHT/3 + 40);
-        ctx.restore();
+        drawContext.save();
+        drawContext.font = "bold 36px 'Helvetica Neue', Helvetica";
+        drawContext.textAlign = "center";
+        drawContext.textBaseline = "middle";
+        drawContext.fillText(text, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2 + 80);
+        drawContext.restore();
     }
 
     // Game end
@@ -578,29 +481,24 @@ $(function(){
         lastDisplayText = "";
         showCenterText = false;
 
-        // Countdown from 3
+        // Countdown from 5
         var cd = 5;
 
-        ctx.save();
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-//        demoPlunger = new plunger();
-//        demoPlunger.x = t.x + 150;
-//        demoPlunger.y = 370;
+        drawContext.save();
+        drawContext.fillStyle = "white";
+        drawContext.textAlign = "center";
+        drawContext.textBaseline = "middle";
 
         var countDown = function(){
             if(cd > 0 && initialLoad){
-//                clearCanvas();
                 currentCD = cd;
                 drawCDScreen();
                 cd--;
                 createjs.Sound.play("click");
                 setTimeout(countDown, 1000);
-
             } else { // start actual game!
-                ctx.restore();
-                createjs.Sound.play("bg", {loop: -1});
+                drawContext.restore();
+                createjs.Sound.play("bg", { loop: -1, volume: 0.3 });
                 gameLoop = startLoop();
                 gameGoing = true;
                 initialLoad = false;
@@ -614,9 +512,9 @@ $(function(){
     function drawHP(x, y, w, h, margin){
         for (var i = 0; i < maxHP; i++){
             if(i < HP){
-                toiletRed.draw(ctx, x, y, w, h);
+                toiletRed.draw(drawContext, x, y, w, h);
             } else {
-                toiletGrey.draw(ctx, x, y, w, h);
+                toiletGrey.draw(drawContext, x, y, w, h);
             }
             x = x + w + margin;
         }
@@ -625,11 +523,10 @@ $(function(){
     // Draws the countdown screen
     function drawCDScreen(cd){
         draw(true);
-        ctx.font = "150px Helvetica";
-        ctx.fillText(currentCD, CANVAS_WIDTH/2 , CANVAS_HEIGHT/3);
-        ctx.font = "16pt Helvetica";
-        ctx.fillText('Press "LEFT" and "RIGHT" keys to move toilet', CANVAS_WIDTH/2 , CANVAS_HEIGHT/3 + 120);
-        ctx.fillText('Catch plungers in the toilet hole to score', CANVAS_WIDTH/2 , CANVAS_HEIGHT/3 + 150);
+        drawContext.font = "bold 190px 'Helvetica Neue', Helvetica";
+        drawContext.fillText(currentCD, CANVAS_WIDTH/2 , CANVAS_HEIGHT/2 - 20);
+        drawContext.font = "bold 36px 'Helvetica Neue', Helvetica";
+        drawContext.fillText('Use ' + String.fromCharCode(9664) + '  and  ' + String.fromCharCode(9654) + '  keys', CANVAS_WIDTH/2 , CANVAS_HEIGHT/2 + 140);
     }
 
     // Displays a new level indication
@@ -637,17 +534,17 @@ $(function(){
         showCenterText = true;
         displayText = "NEW LEVEL";
         if(level == levelToSwirl) {
-            displayText = "You didn't see this coming";
+            displayText = "Look out!";
         }
-        setTimeout(function(){ //stop display of new level after 1.5 seconds
+        setTimeout(function(){ //stop display of new level after a short period
             showCenterText = false;
-        }, 2000);
+        }, 1250);
     }
 
     // Clears the canvas, or covers it with background image
     function clearCanvas(){
-//        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        bg.draw(ctx, 0, 0);
+        bg.draw(drawContext, 0, 0);
+        header.draw(drawContext, 0, 0);
     }
 
     function mute(){
@@ -669,16 +566,4 @@ $(function(){
             drawCDScreen();
         }
     }
-//    function pauseAllSounds(){
-//        for(var id in Sounds){
-//            Sounds[id].pause();
-//            console.log('pausing '+id);
-//        }
-//    }
-//
-//    function resumeAllSounds(){
-//        for(var id in Sounds){
-//            Sounds[id].play();
-//        }
-//    }
 });
